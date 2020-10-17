@@ -32,12 +32,14 @@ The fractional part of the number is encoded with standard binary encoding. Ther
 For example, for 0.345:
 
 <table>
-	<tr>
-		<td>Multiply by 2</td>
-		<td>Integer part</td>
-		<td>Fraction part</td>
-		<td>Bit number in 32-bit representation</td>
-	</tr>
+	<thead>
+		<tr>
+			<th>Multiply by 2</th>
+			<th>Integer part</th>
+			<th>Fraction part</th>
+			<th>Bit number in 32-bit representation</th>
+		</tr>
+	</thead>
 	<tr><td>0.345 * 2 = 0.690</td>	<td>0</td>	<td>0.690</td>	<td>22</td></tr>
 	<tr><td>0.690 * 2 = 1.380</td>	<td>1</td>	<td>0.380</td>	<td>21</td></tr>
 	<tr><td>0.380 * 2 = 0.760</td>	<td>0</td>	<td>0.760</td>	<td>20</td></tr>

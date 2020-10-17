@@ -7,7 +7,7 @@
 
 # Number Encodings
 
-Encoding positive integral numbers
+## Encoding positive integral numbers
 
 Usually, we work with the decimal base to represent numbers, with digits from 0 to 9. The number 127 thus represents: 1*(10*10) + 2*(10) + 7.
 

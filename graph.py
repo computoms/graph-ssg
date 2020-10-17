@@ -79,3 +79,9 @@ def generate_full_graph(source_folder, source_files):
 				g.edge(json['Title'], child)
 	g.format='svg'
 	return g.pipe().decode('utf-8')
+
+
+
+
+
+

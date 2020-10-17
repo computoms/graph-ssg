@@ -51,16 +51,20 @@ def generate_html(json, md):
 	title = json["Title"]
 	abstract = json["Abstract"]
 
-	output_html = "<html><head><title>" + title + "</title></head>"
-	output_html +=  "<body>"
-	output_html += '<div><a href="map.html">Full Map</a></div>'
-	output_html += '<div align="center">'
+	output_html = '<html>\n<head>\n<title>' + title + '</title>'
+	output_html += '<link rel="stylesheet" href="style.css">\n'
+	output_html += "</head>\n"
+	output_html +=  "<body>\n"
+	output_html += '<div class="center">\n<div class="map">\n'
+	output_html += '<a class="map" href="map.html">Full Map</a>\n'
+	output_html += '</div>\n'
+	output_html += '<div align="center" class="graph">\n'
 	output_html += graph.generate_graph(json, source_folder)
-	output_html += '</div>'
-	output_html += '<div>'
+	output_html += '</div>\n</div>\n'
+	output_html += '<div class="center">\n<div class="article">\n'
 	output_html += markdown.markdown(md)
-	output_html +=  "</div>"
-	output_html +=  "</body></html>"
+	output_html +=  "</div>\n</div>\n"
+	output_html +=  "</body>\n</html>"
 
 	return output_html
 

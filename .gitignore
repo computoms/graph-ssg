@@ -1,3 +1,4 @@
 _archive.zip
 output/
 *.pyc
+content/.DS_Store

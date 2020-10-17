@@ -23,12 +23,16 @@ h1 {
 	font-weight: 300;
 	font-size: 26pt;			
 }
+h2 {
+	font-family: 'Source Sans Pro', sans-serif;
+	font-weight: 300;
+}
 p {
 	font-family: 'Source Sans Pro', sans-serif;
 	font-weight: 300;
 }
 div.map {
-	width: 80%;
+	width: 30%;
 	border: 1px solid black;
 	border-radius: 3px;
 	padding-left: 20px;

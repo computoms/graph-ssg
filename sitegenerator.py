@@ -7,6 +7,7 @@ import markdown
 import getopt
 import sys
 from jinja2 import Environment, PackageLoader
+import shutil
 
 import graph
 import article
@@ -47,13 +48,19 @@ for f in raw_source_files:
 	if f != ".DS_Store":
 		source_files.append(f)
 
-
-def generate_html(json, md):
-	title = json["Title"]
-	abstract = json["Abstract"]
-
+def generate_page_from_template(template, data, output_filename):
 	env = Environment(loader=PackageLoader('sitegenerator', 'templates'))
-	page_template = env.get_template('page_template.html')
+	page_template = env.get_template(template)
+	content_html = page_template.render(post=data)
+
+	with open(output_folder + output_filename, "w") as file:
+		display("  - Generating " + output_folder + output_filename)
+		file.write(content_html)
+
+
+def generate_content_page(json, md, output_filename):
+	title = json["Title"]
+	#abstract = json["Abstract"]
 
 	data = {
 	    'content': markdown.markdown(md),
@@ -61,7 +68,15 @@ def generate_html(json, md):
 	    'graph': graph.generate_graph(json, source_folder)
 	}
 
-	return page_template.render(post=data)
+	generate_page_from_template('page_template.html', data, output_filename)
+
+def generate_fixed_page(json, content, filename):
+	data = {
+	    'content': markdown.markdown(content),
+	    'title': json['Title']
+	}
+
+	generate_page_from_template('fixed_page_template.html', data, filename)
 
 def create_file(filename, parent, title, children = ''):
 	output = "{\n"
@@ -120,50 +135,26 @@ def generate_outputs():
 	display("Generating output...")
 	for f in source_files:
 		json, markdown = article.parse(f, source_folder)
-		generated_html = generate_html(json, markdown)
-		file_name = output_folder + f[:-3] + ".html"
-		with open(file_name, "w") as file:
-			display("  - Generated " + file_name)
-			file.write(generated_html)
+		file_name = f[:-3] + ".html"
+		generate_content_page(json, markdown, file_name)
 
 def open_editor(filename):
 	os.system('subl "' + filename + '"')
 
-def generate_index():
-	env = Environment(loader=PackageLoader('sitegenerator', 'templates'))
-	page_template = env.get_template('page_template.html')
+def generate_fixed_page_from_markdown(markdown_filename, output_filename):
+	json, content = article.parse(markdown_filename, 'pages/')
+	generate_fixed_page(json, content, output_filename)
 
+def generate_map():
 	data = {
-	    'content': 'Welcome to Computoms website.',
-	    'title': 'Computoms',
-	    'graph': '<p>Generate Website graph'
+	    'graph': graph.generate_full_graph(source_folder, source_files),
+	    'title': "Graph"
 	}
-
-	content_html = page_template.render(post=data)
-	with open(output_folder + "index.html", "w") as file:
-		display("  - Generating index " + output_folder + "index.html")
-		file.write(content_html)
-
-def generate_fixed_page(title, content, graph, filename):
-	env = Environment(loader=PackageLoader('sitegenerator', 'templates'))
-	page_template = env.get_template('page_template.html')
-
-	data = {
-	    'content': content,
-	    'title': title,
-	    'graph': graph
-	}
-
-	content_html = page_template.render(post=data)
-	with open(output_folder + filename, "w") as file:
-		display("  - Generating " + output_folder + filename)
-		file.write(content_html)
+	generate_page_from_template('map_template.html', data, 'map.html')
 
 def generate_pages():
-	generate_fixed_page('Blog', '', graph.generate_full_graph(source_folder, source_files), 'map.html')
-	generate_fixed_page('Computoms', 'Welcome to Computoms website.', '', 'index.html')
-	generate_fixed_page('About', 'About Computoms', '', 'about.html')
-	generate_fixed_page('Contact', 'Contact information', '', 'contact.html')
+	shutil.copyfile('templates/index.html', output_folder + "index.html")
+	generate_map()
 
 
 # Script start

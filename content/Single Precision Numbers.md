@@ -31,23 +31,23 @@ The fractional part of the number is encoded with standard binary encoding. Ther
 
 For example, for 0.345:
 
-<table>
+<table class="w3-table-all w3-hoverable">
 	<thead>
-		<tr>
+		<tr class="w3-green">
 			<th>Multiply by 2</th>
 			<th>Integer part</th>
 			<th>Fraction part</th>
 			<th>Bit number in 32-bit representation</th>
 		</tr>
 	</thead>
-	<tr><td>0.345 * 2 = 0.690</td>	<td>0</td>	<td>0.690</td>	<td>22</td></tr>
-	<tr><td>0.690 * 2 = 1.380</td>	<td>1</td>	<td>0.380</td>	<td>21</td></tr>
-	<tr><td>0.380 * 2 = 0.760</td>	<td>0</td>	<td>0.760</td>	<td>20</td></tr>
-	<tr><td>0.760 * 2 = 1.520</td>	<td>1</td>	<td>0.520</td>	<td>19</td></tr>
-	<tr><td>0.520 * 2 = 1.040</td>	<td>1</td>	<td>0.040</td>	<td>18</td></tr>
-	<tr><td>0.040 * 2 = 0.080</td>	<td>0</td>	<td>0.080</td>	<td>17</td></tr>
-	<tr><td>..</td>	<td>..</td>	<td>..</td>	<td>..</td></tr>
-	<tr><td>0.880 * 2 = 1.760</td>	<td>1</td>	<td>0.760</td>	<td>0</td></tr>
+	<tr class="w3-hover-green"><td>0.345 * 2 = 0.690</td>	<td>0</td>	<td>0.690</td>	<td>22</td></tr>
+	<tr class="w3-hover-green"><td>0.690 * 2 = 1.380</td>	<td>1</td>	<td>0.380</td>	<td>21</td></tr>
+	<tr class="w3-hover-green"><td>0.380 * 2 = 0.760</td>	<td>0</td>	<td>0.760</td>	<td>20</td></tr>
+	<tr class="w3-hover-green"><td>0.760 * 2 = 1.520</td>	<td>1</td>	<td>0.520</td>	<td>19</td></tr>
+	<tr class="w3-hover-green"><td>0.520 * 2 = 1.040</td>	<td>1</td>	<td>0.040</td>	<td>18</td></tr>
+	<tr class="w3-hover-green"><td>0.040 * 2 = 0.080</td>	<td>0</td>	<td>0.080</td>	<td>17</td></tr>
+	<tr class="w3-hover-green"><td>..</td>	<td>..</td>	<td>..</td>	<td>..</td></tr>
+	<tr class="w3-hover-green"><td>0.880 * 2 = 1.760</td>	<td>1</td>	<td>0.760</td>	<td>0</td></tr>
 </table>
 
 ## Range and Precision

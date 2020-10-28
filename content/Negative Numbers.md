@@ -17,32 +17,32 @@ Let's take a 4-bits chuck of memory as an example. In regular encoding, as seen 
 
 The two's complement method goes like this: for each strictly positive number, you can find it's negative counter-part by inverting all its bits and adding one. For example:
 
-<table>
-	<tr>
+<table class="w3-table-all w3-hoverable">
+	<tr class="w3-green">
 		<td>Number (base 10)</td>
 		<td>4-bits binary</td>
 		<td>Negative (base 10)</td>
 		<td>Two's complement</td>
 	</tr>
-	<tr>
+	<tr class="w3-hover-green">
 		<td>1</td>
 		<td>0001</td>
 		<td>-1</td>
 		<td>1110 + 0001 = 1111</td>
 	</tr>
-	<tr>
+	<tr class="w3-hover-green">
 		<td>2</td>
 		<td>0010</td>
 		<td>-2</td>
 		<td>1101 + 0001 = 1110</td>
 	</tr>
-	<tr>
+	<tr class="w3-hover-green">
 		<td>3</td>
 		<td>0011</td>
 		<td>-3</td>
 		<td>1100 + 0001 = 1101</td>
 	</tr>
-	<tr>
+	<tr class="w3-hover-green">
 		<td>7</td>
 		<td>0111</td>
 		<td>-7</td>
@@ -53,32 +53,32 @@ The two's complement method goes like this: for each strictly positive number, y
 
 This also works the other way around:
 
-<table>
-	<tr>
+<table class="w3-table-all w3-hoverable">
+	<tr class="w3-green">
 		<td>Number (base 10)</td>
 		<td>4-bits binary</td>
 		<td>Negative (base 10)</td>
 		<td>Two's complement</td>
 	</tr>
-	<tr>
+	<tr class="w3-hover-green">
 		<td>-1</td>
 		<td>1111</td>
 		<td>1</td>
 		<td>0000 + 0001 = 0001</td>
 	</tr>
-	<tr>
+	<tr class="w3-hover-green">
 		<td>-2</td>
 		<td>1110</td>
 		<td>2</td>
 		<td>0001 + 0001 = 0010</td>
 	</tr>
-	<tr>
+	<tr class="w3-hover-green">
 		<td>-3</td>
 		<td>1101</td>
 		<td>3</td>
 		<td>0010 + 0001 = 0011</td>
 	</tr>
-	<tr>
+	<tr class="w3-hover-green">
 		<td>-7</td>
 		<td>1001</td>
 		<td>7</td>
@@ -88,18 +88,18 @@ This also works the other way around:
 
 There are two special cases, though: 0 and -8:
 
-<table>
-	<tr>
+<table class="w3-table-all w3-hoverable">
+	<tr class="w3-green">
 		<td>Number (base 10)</td>
 		<td>4-bits binary</td>
 		<td>Two's complement</td>
 	</tr>
-	<tr>
+	<tr class="w3-hover-green">
 		<td>0</td>
 		<td>0000</td>
 		<td>0000</td>
 	</tr>
-	<tr>
+	<tr class="w3-hover-green">
 		<td>-8</td>
 		<td>1000</td>
 		<td>1000</td>
@@ -108,20 +108,20 @@ There are two special cases, though: 0 and -8:
 
 More formally, the two's complement b of a binary number a encoded using n bits is the binary number such that a + b = 2^n with n the number of bits that encodes a and b. Thus, b = 2^n - a, and we can find our two special cases:
 
-<table>
-	<tr>
+<table class="w3-table-all w3-hoverable">
+	<tr class="w3-green">
 		<td>4-bit number a</td>
 		<td>Two's complement (base 10)</td>
 		<td>Two's complement on 5-bits</td>
 		<td>4-bit Two's complement</td>
 	</tr>
-	<tr>
+	<tr class="w3-hover-green">
 		<td>0000</td>
 		<td>16 - 0 = 16</td>
 		<td>10000 - 00000 = 10000</td>
 		<td>0000</td>
 	</tr>
-	<tr>
+	<tr class="w3-hover-green">
 		<td>1000</td>
 		<td>16 - 8 = 8</td>
 		<td>10000 - 01000 = 01000</td>

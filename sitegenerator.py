@@ -129,16 +129,42 @@ def generate_outputs():
 def open_editor(filename):
 	os.system('subl "' + filename + '"')
 
-def generate_full_map():
-	output_html = "<html><head><title>Full Map</title></head>"
-	output_html += "<body>"
-	output_html += "<div>"
-	output_html += graph.generate_full_graph(source_folder, source_files)
-	output_html += "</div>"
-	output_html += "</body></html>"
-	with open(output_folder + "map.html", "w") as file:
-		display("  - Generating full map " + output_folder + "map.html")
-		file.write(output_html)
+def generate_index():
+	env = Environment(loader=PackageLoader('sitegenerator', 'templates'))
+	page_template = env.get_template('page_template.html')
+
+	data = {
+	    'content': 'Welcome to Computoms website.',
+	    'title': 'Computoms',
+	    'graph': '<p>Generate Website graph'
+	}
+
+	content_html = page_template.render(post=data)
+	with open(output_folder + "index.html", "w") as file:
+		display("  - Generating index " + output_folder + "index.html")
+		file.write(content_html)
+
+def generate_fixed_page(title, content, graph, filename):
+	env = Environment(loader=PackageLoader('sitegenerator', 'templates'))
+	page_template = env.get_template('page_template.html')
+
+	data = {
+	    'content': content,
+	    'title': title,
+	    'graph': graph
+	}
+
+	content_html = page_template.render(post=data)
+	with open(output_folder + filename, "w") as file:
+		display("  - Generating " + output_folder + filename)
+		file.write(content_html)
+
+def generate_pages():
+	generate_fixed_page('Blog', '', graph.generate_full_graph(source_folder, source_files), 'map.html')
+	generate_fixed_page('Computoms', 'Welcome to Computoms website.', '', 'index.html')
+	generate_fixed_page('About', 'About Computoms', '', 'about.html')
+	generate_fixed_page('Contact', 'Contact information', '', 'contact.html')
+
 
 # Script start
 if update:
@@ -150,5 +176,5 @@ if update:
 
 if generate:
 	generate_outputs()
-	generate_full_map()
+	generate_pages()
 	

@@ -15,7 +15,7 @@ import article
 try:
 	opts, args = getopt.getopt(sys.argv[1:], "ug", ["update", "generate"])
 except getopt.GetoptError:
-	print 'parse.py [-u] [-g]'
+	print 'sitegenerator.py [-u] [-g]'
 	sys.exit(2)
 
 update = False

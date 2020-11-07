@@ -16,6 +16,8 @@ import article
 # This scripts reads the 'content/' directory (containing source files
 # as markdown) and generates corresponding output html files.
 
+# Parse script arguments
+
 try:
 	opts, args = getopt.getopt(sys.argv[1:], "ug", ["update", "generate"])
 except getopt.GetoptError:
@@ -33,6 +35,8 @@ for opt, arg in opts:
 if (not update) and (not generate):
 	update = True
 	generate = True
+
+# Utils
 
 def display(text):
 	print(text)

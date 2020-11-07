@@ -1,4 +1,5 @@
 from os import walk
+import os
 from os import path
 import shutil
 import json
@@ -11,15 +12,25 @@ import json
 with open('publish-settings.json', "r") as file:
 	publish_settings = json.loads(file.read())
 
-output_folder = "output/"
-publish_to = publish_settings['publish-to']
-print('Publishing to ' + str(publish_to))
+publish_root = publish_settings['publish_root']
+print('Publishing to ' + str(publish_root))
 
-published_files = []
-for (dirpath, dirnames, filenames) in walk(output_folder):
-	published_files.extend(filenames)
-	break
+for folder_publish in publish_settings["folders"]:
+	source_folder = folder_publish["source"]
+	destination_folder = folder_publish["destination"]
+	published_files = []
+	for (dirpath, dirnames, filenames) in walk(source_folder):
+		published_files.extend(filenames)
+		break
 
-for file in published_files:
-	shutil.copy(path.join(output_folder, file), publish_to)
-	print("Updated " + file)
+	print('Publishing files in ' + source_folder)
+	destination_path = path.join(publish_root, destination_folder)
+	if not path.exists(destination_path):
+		os.makedirs(destination_path)
+
+	for file in published_files:
+		source_filename = path.join(source_folder, file)
+		destination_filename = path.join(publish_root, destination_folder, file)
+		#print("Publishing from " + str(source_filename) + " to " + str(destination_filename))
+		shutil.copy2(source_filename, destination_filename)
+		print("Updated " + file)

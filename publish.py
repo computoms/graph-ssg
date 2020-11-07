@@ -7,7 +7,14 @@ import json
 # This script publishes the results into the publish directory
 # Using a json file publish-settings.json at the root of the repository
 # Content: 
-# { "publish-to": "/path/to/destination/" }
+# {
+#	"publish_root": "/path/to/publish/root",
+#	"folders": [
+#		{"source": "output", "destination": ""},
+#		{"source": "output/images", "destination": "images"},
+# 		{"source": "output/images/articles", "destination": "images/articles"}
+#	]
+#}
 
 with open('publish-settings.json', "r") as file:
 	publish_settings = json.loads(file.read())

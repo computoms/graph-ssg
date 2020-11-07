@@ -2,7 +2,7 @@
     "Title": "Random Access Memories",
     "Abstract": "",
     "Parents": ["Computer Memories"],
-    "Children": ["MOSFET Transistors", "Capacitors"]
+    "Children": ["DRAM Cell"]
 }
 
 # Random Access Memories

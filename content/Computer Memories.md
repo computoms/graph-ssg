@@ -1,9 +1,4 @@
-{
-    "Title": "Computer Memories",
-    "Abstract": "Computer memories to store computing data",
-    "Parents": ["Storing Information on a Computer"],
-    "Children": ["Hard Drives", "Random Access Memories", "Processor Cache Memories"]
-}
+{"Abstract": "Computer memories to store computing data", "Parents": ["Storing Information on a Computer", "Logic Circuits"], "Children": ["Hard Drives", "Random Access Memories", "Processor Cache Memories", "Logic Circuits"], "Title": "Computer Memories"}
 
 # Computer Memories
 

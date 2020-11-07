@@ -2,7 +2,7 @@
     "Title": "Hard Drives",
     "Abstract": "",
     "Parents": ["Computer Memories"],
-    "Children": ["Magnetic Drives", "Flash Drives"]
+    "Children": ["Magnetic Drives", "Flash Drives", "SSD"]
 }
 
 # Hard Drives

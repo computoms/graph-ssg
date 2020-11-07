@@ -34,4 +34,8 @@ The strong and weak nuclear forces are forces that rule the sub-atomic world. Th
 
 ## The Electromagnetic force: electrons charge & spin
 
+The electromagnetic force regroups the electric force that relates to the electric charge of electrons and the magnetic force that relates to the spin of electrons.
 
+The force applied on a moving particle `q` of velocity `v` inside an environment where an electric field `E` and a magnetic field `B` is present is equal to:
+
+`F = qE + qv x B`

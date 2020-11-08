@@ -11,6 +11,7 @@ import shutil
 
 import graph
 import article
+import filechanges
 
 
 # This scripts reads the 'content/' directory (containing source files
@@ -44,6 +45,7 @@ def display(text):
 # Static site generator that parses the files inside content/ subfolder and extracts information from their content (markdown files) + frontmatter in JSON
 source_folder = "content/"
 output_folder = "output/"
+changes = filechanges.FileChangeRegister("changes.txt")
 
 display("Parsing " + source_folder + " folder")
 
@@ -102,9 +104,11 @@ def create_file(filename, parent, title, children = ''):
 
 def create_new_files():
 	display("Creating new source files for children / parents")
-
 	new_files = []
 	for f in source_files:
+		if not changes.has_changed(source_folder + f):
+			continue
+		
 		json, markdown = article.parse(f, source_folder)
 		for child in json["Children"]:
 			if child == "":
@@ -142,6 +146,8 @@ def check_parents():
 def generate_outputs():
 	display("Generating output...")
 	for f in source_files:
+		if not changes.has_changed(source_folder + f):
+			continue
 		json, markdown = article.parse(f, source_folder)
 		file_name = f[:-3] + ".html"
 		generate_content_page(json, markdown, file_name)

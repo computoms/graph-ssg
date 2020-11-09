@@ -70,6 +70,21 @@ def haschanged_whenfilenotinregister_addstoregister():
 	os.remove("test/TestFile.txt")
 	os.remove("test/change.txt")
 
+def update_whenfileinregister_updatesregister():
+	r = filechanges.FileChangeRegister("test/change.txt")
+	with open("test/TestFile.txt", "w") as file:
+		file.write("Hello")
+	with open("test/change.txt", "w") as file:
+		file.write("test/TestFile.txt," + r.compute_hash("test/TestFile.txt") + "\n")
+	assert(r.has_changed("test/TestFile.txt") == False)
+	with open("test/TestFile.txt", "w") as file:
+		file.write("Hello 2")
+	assert(r.has_changed("test/TestFile.txt") == True)
+	r.update("test/TestFile.txt")
+	assert(r.has_changed("test/TestFile.txt") == False)
+	os.remove("test/TestFile.txt")
+	os.remove("test/change.txt")
+
 
 readregisters_whenemptyfile_returnsemptycollection()
 readregisters_whensingleentry_returnscorrectentry()
@@ -77,3 +92,4 @@ writeregisters_whensingleentry_writescorrectfile()
 haschanged_whenfilenotchanged_returnsfalse()
 haschanged_whenfilechanged_returnstrue()
 haschanged_whenfilenotinregister_addstoregister()
+update_whenfileinregister_updatesregister()

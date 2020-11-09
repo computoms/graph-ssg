@@ -26,9 +26,13 @@ class FileChangeRegister:
 		with open(self.change_db, "w") as file:
 			file.write(csv_content)
 
-
 	def compute_hash(self, filename):
 		return hashlib.md5(open(filename,'rb').read()).hexdigest()
+
+	def update(self, filename):
+		registers = self.read_registers()
+		registers[filename] = self.compute_hash(filename)
+		self.write_registers(registers)
 
 	def has_changed(self, filename):
 		registers = self.read_registers()

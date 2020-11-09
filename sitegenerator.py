@@ -14,172 +14,181 @@ import article
 import filechanges
 
 
-# This scripts reads the 'content/' directory (containing source files
-# as markdown) and generates corresponding output html files.
-
-# Parse script arguments
-
-try:
-	opts, args = getopt.getopt(sys.argv[1:], "ug", ["update", "generate"])
-except getopt.GetoptError:
-	print 'sitegenerator.py [-u] [-g]'
-	sys.exit(2)
-
-update = False
-generate = False
-for opt, arg in opts:
-	if opt == '-u':
-		update = True
-	elif opt == '-g':
-		generate == True
-
-if (not update) and (not generate):
-	update = True
-	generate = True
-
 # Utils
 
 def display(text):
 	print(text)
 
-# Static site generator that parses the files inside content/ subfolder and extracts information from their content (markdown files) + frontmatter in JSON
-source_folder = "content/"
-output_folder = "output/"
-changes = filechanges.FileChangeRegister("changes.txt")
 
-display("Parsing " + source_folder + " folder")
+# FileManager class handles the source files and their state. 
+class FileManager:
+	def __init__(self, source_folder):
+		self.source_folder = source_folder
+		self.changes = filechanges.FileChangeRegister("changes.txt")
 
-raw_source_files = []
-for (dirpath, dirnames, filenames) in walk(source_folder):
-	raw_source_files.extend(filenames)
+	def get_files(self):
+		raw_source_files = []
+		for (dirpath, dirnames, filenames) in walk(self.source_folder):
+			raw_source_files.extend(filenames)
 
-source_files = []
-for f in raw_source_files:
-	if f != ".DS_Store":
-		source_files.append(f)
+		source_files = []
+		for f in raw_source_files:
+			if f != ".DS_Store":
+				source_files.append(f)
 
-def generate_page_from_template(template, data, output_filename):
-	env = Environment(loader=PackageLoader('sitegenerator', 'templates'))
-	page_template = env.get_template(template)
-	content_html = page_template.render(post=data)
+		return source_files
 
-	with open(output_folder + output_filename, "w") as file:
-		display("  - Generating " + output_folder + output_filename)
-		file.write(content_html)
+	def get_changed_files(self):
+		files = self.get_files()
+		return [file for file in files if self.changes.has_changed(self.source_folder + file)]
 
+	def sync(self, filename):
+		self.changes.update(self.source_folder + filename)
 
-def generate_content_page(json, md, output_filename):
-	title = json["Title"]
-	#abstract = json["Abstract"]
+# PageGenerator class handles the generation of html pages from markdown source files
+class PageGenerator:
+	def __init__(self, template_folder, template):
+		self.template = template
+		if template_folder[-1] == '/':
+			template_folder = template_folder[:-1]
+		self.template_location = template_folder
 
-	data = {
-	    'content': markdown.markdown(md),
-	    'title': title,
-	    'graph': graph.generate_graph(json, source_folder)
-	}
+	def generate(self, data, output_filename): # TODO should contain output_folder in the path
+		env = Environment(loader=PackageLoader('sitegenerator', self.template_location))
+		page_template = env.get_template(self.template)
+		content_html = page_template.render(post=data)
 
-	generate_page_from_template('page_template.html', data, output_filename)
+		with open(output_filename, "w") as file:
+			display("  - Generating " + output_filename)
+			file.write(content_html)
 
-def generate_fixed_page(json, content, filename):
-	data = {
-	    'content': markdown.markdown(content),
-	    'title': json['Title']
-	}
+# Specialized class that uses a PageGenerator to generate articles
+# from the 'page_template.html' template.
+class ArticleGenerator:
+	def __init__(self, template_folder, source_folder):
+		self.generator = PageGenerator(template_folder, 'page_template.html')
+		self.source_folder = source_folder
 
-	generate_page_from_template('fixed_page_template.html', data, filename)
+	def generate(self, json, md, output_filename):
+		title = json["Title"]
+		#abstract = json["Abstract"]
 
-def create_file(filename, parent, title, children = ''):
-	output = "{\n"
-	output += '    "Title": "' + title + '",\n'
-	output += '    "Abstract": "",\n'
-	output += '    "Parents": ["' + parent + '"],\n'
-	output += '    "Children": ["' + children + '"]\n'
-	output += '}\n'
-	output += '\n'
-	output += '# ' + title + '\n'
+		data = {
+		    'content': markdown.markdown(md),
+		    'title': title,
+		    'graph': graph.generate_graph(json, self.source_folder)
+		}
 
-	with open(filename, "w") as file:
-		file.write(output)
+		self.generator.generate(data, output_filename)
 
+# The SourceLinker class handles the creation of new child source files
+# as well as checks and updates the links between articles to keep them up-to-date.
+class SourceLinker:
+	def __init__(self, source_folder):
+		self.source_folder = source_folder
+		self.open_editor_on_create = True
 
-def create_new_files():
-	display("Creating new source files for children / parents")
-	new_files = []
-	for f in source_files:
-		if not changes.has_changed(source_folder + f):
-			continue
-		
-		json, markdown = article.parse(f, source_folder)
-		for child in json["Children"]:
-			if child == "":
+	def create_empty_source_file(self, filename, parent, title, children = ''):
+		output = "{\n"
+		output += '    "Title": "' + title + '",\n'
+		output += '    "Abstract": "",\n'
+		output += '    "Parents": ["' + parent + '"],\n'
+		output += '    "Children": ["' + children + '"]\n'
+		output += '}\n'
+		output += '\n'
+		output += '# ' + title + '\n'
+
+		with open(filename, "w") as file:
+			file.write(output)
+
+	def open_editor(self, filename):
+		os.system('subl "' + filename + '"')
+
+	def create_children(self, source_files):
+		display("Creating new children...")
+		new_files = []
+		for f in source_files:
+			json, markdown = article.parse(f, self.source_folder)
+			for child in json["Children"]:
+				if child == "":
+					continue
+
+				new_filename = self.source_folder + child + ".md"
+				if not path.exists(self.source_folder + child + ".md"):
+					self.create_empty_source_file(new_filename, json["Title"], child)
+					new_files.append(new_filename)
+					display("  - Created " + new_filename)
+			if len(json['Parents']) == 0 or json['Parents'][0] == "":
 				continue
 
-			new_filename = source_folder + child + ".md"
-			if not path.exists(source_folder + child + ".md"):
-				create_file(new_filename, json["Title"], child)
+			new_filename = self.source_folder + json["Parents"][0] + ".md"
+			if not path.exists(new_filename):
+				self.create_empty_source_file(new_filename, "", json["Parents"][0], json["Title"])
 				new_files.append(new_filename)
 				display("  - Created " + new_filename)
-		if len(json['Parents']) == 0 or json['Parents'][0] == "":
-			continue
 
-		new_filename = source_folder + json["Parents"][0] + ".md"
-		if not path.exists(new_filename):
-			create_file(new_filename, "", json["Parents"][0], json["Title"])
-			new_files.append(new_filename)
-			display("  - Created " + new_filename)
-
-	return new_files
-
-def check_parents():
-	display("Updating parent linkings...")
-	for f in source_files:
-		json, markdown = article.parse(f, source_folder)
-		for child in json['Children']:
-			if child == "":
-				continue
-
-			json_child, md_child = article.parse(child + ".md", source_folder)
-			if not json['Title'] in json_child['Parents']:
-				json_child['Parents'].append(json['Title'])
-				article.save(json_child, md_child, source_folder + child + ".md")
-
-def generate_outputs():
-	display("Generating output...")
-	for f in source_files:
-		if not changes.has_changed(source_folder + f):
-			continue
-		json, markdown = article.parse(f, source_folder)
-		file_name = f[:-3] + ".html"
-		generate_content_page(json, markdown, file_name)
-
-def open_editor(filename):
-	os.system('subl "' + filename + '"')
-
-def generate_fixed_page_from_markdown(markdown_filename, output_filename):
-	json, content = article.parse(markdown_filename, 'pages/')
-	generate_fixed_page(json, content, output_filename)
-
-def generate_map():
-	data = {
-	    'graph': graph.generate_full_graph(source_folder, source_files),
-	    'title': "Graph"
-	}
-	generate_page_from_template('map_template.html', data, 'map.html')
-
-def generate_pages():
-	shutil.copyfile('templates/index.html', output_folder + "index.html")
-	generate_map()
+		for f in new_files:
+			self.open_editor(f)
 
 
-# Script start
-if update:
-	new_files = create_new_files()
-	for nf in new_files:
-		open_editor(nf)
+	def update_parents(self, source_files):
+		display("Updating parent links...")
+		for f in source_files:
+			json, markdown = article.parse(f, self.source_folder)
+			for child in json['Children']:
+				if child == "":
+					continue
 
-	check_parents()
+				json_child, md_child = article.parse(child + ".md", self.source_folder)
+				if not json['Title'] in json_child['Parents']:
+					json_child['Parents'].append(json['Title'])
+					article.save(json_child, md_child, self.source_folder + child + ".md")
 
-if generate:
-	generate_outputs()
-	generate_pages()
-	
+# Main class to generate files for the site.
+class SiteGenerator:
+
+	def __init__(self):
+		self.source_folder = "content/"
+		self.output_folder = "output/"
+		self.template_folder = "templates/"
+		self.source_manager = FileManager(self.source_folder)
+		self.article_generator = ArticleGenerator(self.template_folder, self.source_folder)
+		self.source_linker = SourceLinker(self.source_folder)
+
+	def generate_map(self):
+		data = {
+	    	'graph': graph.generate_full_graph(self.source_folder, self.source_manager.get_files()),
+	    	'title': "Graph"
+		}
+		page_generator = PageGenerator(self.template_folder, 'map_template.html')
+		page_generator.generate(data, self.output_folder + 'map.html')
+
+	def generate_pages(self):
+		display("Generating fixed pages...")
+		shutil.copyfile('templates/index.html', self.output_folder + "index.html")
+		self.generate_map()
+
+	def generate_articles(self):
+		page_generator = PageGenerator(self.template_folder, 'page_template.html')
+		files = self.source_manager.get_changed_files()
+		if len(files) == 0:
+			display("Source files did not change.")
+		else:
+			display(str(len(files)) + " files updated. Generating outputs...")
+		for f in files:
+			json, markdown = article.parse(f, self.source_folder)
+			file_name = f[:-3] + ".html"
+			self.article_generator.generate(json, markdown, self.output_folder + file_name)
+			self.source_manager.sync(f)
+
+	def update(self):
+		source_files = self.source_manager.get_changed_files()
+		self.source_linker.create_children(source_files)
+		self.source_linker.update_parents(source_files)
+		self.generate_pages()
+		self.generate_articles()
+
+
+if __name__ == "__main__":
+    g = SiteGenerator()
+    g.update()

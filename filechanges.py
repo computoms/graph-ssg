@@ -40,6 +40,4 @@ class FileChangeRegister:
 		if filename in registers:
 			return registers[filename].rstrip() != new_hash
 		else:
-			registers[filename] = new_hash
-			self.write_registers(registers)
 			return True

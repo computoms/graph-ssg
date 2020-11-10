@@ -169,7 +169,6 @@ class SiteGenerator:
 		self.generate_map()
 
 	def generate_articles(self):
-		page_generator = PageGenerator(self.template_folder, 'page_template.html')
 		files = self.source_manager.get_changed_files()
 		if len(files) == 0:
 			display("Source files did not change.")

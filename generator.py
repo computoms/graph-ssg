@@ -1,12 +1,29 @@
 import model as modellib
 import htmlutils
+import graph
 
-def generate():
-	model = modellib.Model()
-	html_generator = htmlutils.HtmlGenerator(model)
-	articles = model.get_articles()
-	print(str(len(articles)) + " articles changed.")
-	for article in articles:
-		html_generator.generate_article(article)
 
-generate()
+filemgr = modellib.FileManager()
+reader = modellib.ArticleReader(filemgr)
+graph_generator = graph.GraphGenerator(reader)
+html_generator = htmlutils.HtmlGenerator(filemgr)
+linker = modellib.FileLinker(filemgr, reader)
+
+def update_new_links():
+	linker.create_new_files()
+	linker.update_missing_links()
+
+def generate_sources():
+	article_names = filemgr.list_changed_source()
+	print(str(len(article_names)) + " articles changed.")
+	for name in article_names:
+		article = reader.read_article(name)
+		graph_svg = graph_generator.generate(article)
+		html_generator.generate_article(article, graph_svg)
+
+if len(filemgr.list_changed_source()) == 0:
+	print('Nothing changed.')
+	exit()
+
+update_new_links()
+generate_sources()

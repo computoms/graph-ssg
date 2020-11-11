@@ -1,87 +1,96 @@
 import json
 from graphviz import Digraph
 
-import article
+import model
 
-def is_valid(collection):
-	return len(collection) != 0 and collection[0] != ""
 
-def add_center_node(g, node_title):
-	g.attr('node', color='gray')
-	g.node(node_title)
-	g.attr('node', color='green')
+class GraphGenerator:
 
-def add_node(g, node_title):
-	if node_title == "":
-		return
-	g.node(node_title, href=node_title + ".html")
+	def __init__(self, article_reader):
+		self.article_reader = article_reader
 
-def add_children(g, node, linked_nodes):
-	if node == "":
-		return
 
-	for n in linked_nodes:
-		if n == "":
-			continue
-		g.node(n, href=n + ".html")
-		g.edge(node, n)
+	def generate_full(self, articles):
+		g = Digraph(name='Full Map', \
+			node_attr={'color': 'green', 'style': 'filled', 'shape': 'box', 'fontcolor': 'white'}, \
+			edge_attr={'arrowhead': 'none', 'arrowtail': 'dot'})
+		for title in articles:
+			g.node(title, href=title + '.html')
+		for title in articles:
+			artcile = self.article_reader.read_article(title)
+			for child_title in article.children:
+				if child_title != "":
+					g.edge(title, child_title)
+		g.format = 'svg'
+		return g.pipe().decode('utf-8')
 
-def add_parent_level(g, parents, title, source_folder):
-	if not is_valid(parents):
-		add_center_node(g, title)
-		return
+	def generate(self, article):
+		g = Digraph(name=article.title, \
+			node_attr={'color': 'green', 'style': 'filled', 'shape': 'box', 'fontcolor': 'white'}, \
+			edge_attr={'arrowhead': 'none', 'arrowtail': 'dot'})
 
-	for parent in parents:
-		if parent == "":
-			continue
-		add_node(g, parent)
+	 	# Parent level, with first children
+		self.add_parent_level(g, article.parents, article.title)	
 
-		for parentChild in article.get_children(parent + '.md', source_folder):
-			if parentChild == "":
+		# Center node's children
+		self.add_children(g, article.title, article.children)
+		# Second level children
+		for child in article.children:
+			if child == "":
 				continue
-			if parentChild == title:
-				add_center_node(g, title)
-			else:
-				add_node(g, parentChild)
-			g.edge(parent, parentChild)
+			child_article = self.article_reader.read_article(child)
+			self.add_children(g, child, child_article.children)
 
-def generate_graph(json, source_folder):
-	title = json['Title']
-	parents = json['Parents']
-	children = json['Children']
-
-	g = Digraph(name=title, node_attr={'color': 'green', 'style': 'filled', 'shape': 'box', 'fontcolor': 'white'}, edge_attr={'arrowhead': 'none', 'arrowtail': 'dot'})
-
- 	# Parent level, with first children
-	add_parent_level(g, parents, title, source_folder)	
-
-	# Center node's children
-	add_children(g, title, children)
-	# Second level children
-	for child in children:
-		if child == "":
-			continue
-		add_children(g, child, article.get_children(child + ".md", source_folder))
+		g.format='svg'
+		return g.pipe().decode('utf-8')
 
 
-	g.format='svg'
-	return g.pipe().decode('utf-8')
+	def add_parent_level(self, g, parents, title):
+		if not self.is_valid(parents):
+			self.add_center_node(g, title)
+			return
 
-def generate_full_graph(source_folder, source_files):
-	g = Digraph(name='Full Map', node_attr={'color': 'green', 'style': 'filled', 'shape': 'box', 'fontcolor': 'white'}, edge_attr={'arrowhead': 'none', 'arrowtail': 'dot'})
-	for f in source_files:
-		json, markdown = article.parse(f, source_folder)
-		g.node(json['Title'], href=json['Title'] + '.html')
-	for f in source_files:
-		json, markdown = article.parse(f, source_folder)
-		for child in json['Children']:
-			if child != "":
-				g.edge(json['Title'], child)
-	g.format='svg'
-	return g.pipe().decode('utf-8')
+		for parent in parents:
+			if parent == "":
+				continue
+			self.add_node(g, parent)
+
+			parent_article = self.article_reader.read_article(parent)
+
+			for parentChild in parent_article.children:
+				if parentChild == "":
+					continue
+				if parentChild == title:
+					self.add_center_node(g, title)
+				else:
+					self.add_node(g, parentChild)
+				g.edge(parent, parentChild)
 
 
+	def add_children(self, g, node, linked_nodes):
+		if node == "":
+			return
+
+		for n in linked_nodes:
+			if n == "":
+				continue
+			g.node(n, href=n + ".html")
+			g.edge(node, n)
 
 
+	def add_center_node(self, g, node_title):
+		g.attr('node', color='gray')
+		g.node(node_title)
+		g.attr('node', color='green')
 
+	def add_node(self, g, node_title):
+		if node_title == "":
+			return
+		g.node(node_title, href=node_title + ".html")
 
+	def is_valid(self, collection):
+		return len(collection) != 0 and collection[0] != ""
+
+	
+	
+	

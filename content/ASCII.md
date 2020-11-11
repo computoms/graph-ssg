@@ -15,5 +15,4 @@ The English alphabet is composed of 26 letters, that are declined into lowercase
 
 Knowing that the bigger the number, the more space it takes in a computer memory; they wanted to limit the space taken by each character in memory so they decided that this encoding was sufficient to encode English texts. Each symbol corresponds to a single number, as shown below
 
-Image of the ASCII conversion table
-
+Image of the ASCII conversion table.

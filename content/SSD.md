@@ -1,9 +1,10 @@
 {
-    "Title": "SSD",
-    "Abstract": "",
-    "Parents": ["Hard Drives"],
-    "Children": ["Floating-Gate Transistors"]
+"Title": "SSD",
+"Abstract": "", 
+"Parents": ["Hard Drives"], 
+"Children": ["Floating-Gate Transistors","Logic Circuits"] 
 }
+
 
 # Solid State Drives (SSDs)
 

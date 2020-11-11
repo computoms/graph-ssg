@@ -1,9 +1,10 @@
 {
-    "Title": "Flash Drives",
-    "Abstract": "",
-    "Parents": ["Hard Drives"],
-    "Children": ["Floating-Gate Transistors"]
+"Title": "Flash Drives",
+"Abstract": "", 
+"Parents": ["Hard Drives"], 
+"Children": ["Floating-Gate Transistors","Capacitors"] 
 }
+
 
 # Flash Drives
 

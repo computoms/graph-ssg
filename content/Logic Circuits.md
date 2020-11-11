@@ -1,4 +1,10 @@
-{"Abstract": "", "Parents": ["Computer Memories", "SSD"], "Children": ["NOT Gate", "AND Gate", "OR Gate", "MOSFET Transistors"], "Title": "Logic Circuits"}
+{
+"Title": "Logic Circuits",
+"Abstract": "", 
+"Parents": ["Computer Memories","SSD"], 
+"Children": ["NOT Gate","AND Gate","OR Gate","MOSFET Transistors","Computer Memories"] 
+}
+
 
 # Logic Circuits
 

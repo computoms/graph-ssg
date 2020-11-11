@@ -20,3 +20,15 @@ class HtmlGenerator:
 
 		self.filemgr.save_output(article.title, content_html)
 		print("- Generated " + article.title)
+
+	def generate_map(self, graph_svg):
+		data = {
+	    	'graph': graph_svg,
+	    	'title': "Graph"
+		}
+
+		env = Environment(loader=PackageLoader('htmlutils', self.filemgr.template_location))
+		page_template = env.get_template(self.filemgr.template_map)
+		content_html = page_template.render(post=data)
+
+		self.filemgr.save_output('map', content_html)

@@ -75,6 +75,7 @@ class FileManager:
 		self.render_folder = "output/"
 		self.render_extension = ".html"
 		self.template_name = "page_template.html"
+		self.template_map = "map_template.html"
 		self.change_register = filechanges.FileChangeRegister("changes.txt")
 		self.file_filters = [".DS_Store"]
 

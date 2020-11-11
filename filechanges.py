@@ -27,6 +27,8 @@ class FileChangeRegister:
 			file.write(csv_content)
 
 	def compute_hash(self, filename):
+		if not os.path.exists(filename):
+			return ""
 		return hashlib.md5(open(filename,'rb').read()).hexdigest()
 
 	def update(self, filename):

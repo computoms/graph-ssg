@@ -17,7 +17,7 @@ class GraphGenerator:
 		for title in articles:
 			g.node(title, href=title + '.html')
 		for title in articles:
-			artcile = self.article_reader.read_article(title)
+			article = self.article_reader.read_article(title)
 			for child_title in article.children:
 				if child_title != "":
 					g.edge(title, child_title)

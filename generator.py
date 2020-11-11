@@ -1,6 +1,7 @@
 import model as modellib
 import htmlutils
 import graph
+import shutil
 
 
 filemgr = modellib.FileManager()
@@ -21,9 +22,16 @@ def generate_sources():
 		graph_svg = graph_generator.generate(article)
 		html_generator.generate_article(article, graph_svg)
 
+
+def generate_fixed_pages():
+	shutil.copyfile('templates/index.html', filemgr.render_folder + "index.html")
+	html_generator.generate_map(graph_generator.generate_full(filemgr.list_source()))
+
+
 if len(filemgr.list_changed_source()) == 0:
 	print('Nothing changed.')
 	exit()
 
 update_new_links()
 generate_sources()
+generate_fixed_pages()

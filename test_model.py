@@ -1,63 +1,76 @@
 import model
 
-class TestingModel:
+class TestingFileManager:
 	def __init__(self):
-		self.content = []
-		self.saved_content = {}
+		self.source = ""
+		self.output = ""
+
+	def apply_filter(self, source_file):
+		for filt in self.file_filters:
+			if filt in source_file:
+				return False
+		return True
+
+	def list_source(self):
+		return ['Source01', 'Source02', 'Source03']
+
+	def list_changed_source(self):
+		return ['Source02']
+
+	def exists(self, name):
+		return name in self.list_source()
+
+	def get_full_path(self, name):
+		return name
 
 	def get_source_content(self, name):
-		return self.content
+		return '{"Title": "Test", "Abstract": "", "Children": ["Children01", "Children02"], "Parents": ["Parent01"]} Content'
 
-	def save(self, name, content):
-		self.saved_content[name] = content
+	def set_source_content(self, name, content):
+		self.source = content
 
-	def get_articles(self, only_changed=True):
-		articles = ['A', 'B', 'C']
-		return [model.Article(f, self) for f in articles]
+	def save_output(self, name, content):
+		self.output = content
+
+def articlereader_readarticle_validarticle_returnsvalidtitle():
+	f = TestingFileManager()
+	a = model.ArticleReader(f)
+	article = a.read_article('Source01')
+	assert(article.title == "Test")
+
+def articlereader_readarticle_validarticle_returnsvalidparents():
+	f = TestingFileManager()
+	a = model.ArticleReader(f)
+	article = a.read_article('Source01')
+	assert(len(article.parents) == 1)
+	assert(article.parents[0] == "Parent01")
 
 
+def articlereader_readarticle_validarticle_returnsvalidchildren():
+	f = TestingFileManager()
+	a = model.ArticleReader(f)
+	article = a.read_article('Source01')
+	assert(len(article.children) == 2)
+	assert(article.children[0] == "Children01")
+	assert(article.children[1] == "Children02")
 
-def parse_validarticle_returnsvalidtitle():
-	m = TestingModel()
-	m.content = ['{"Title": "TestTitle", "Abstract": "", "Parents": [], "Children": []}', 'Some content']
-	a = model.Article('Test', m)
-	assert(a.get_title() == 'TestTitle')
+def articlereader_readarticle_validarticle_returnsvalidcontent():
+	f = TestingFileManager()
+	a = model.ArticleReader(f)
+	article = a.read_article('Source01')
+	assert(article.content == " Content")
 
-def parse_validarticle_returnsvalidparents():
-	m = TestingModel()
-	m.content = ['{"Title": "TestTitle", "Abstract": "", "Parents": ["Parent01", "Parent02"], "Children": []}', 'Some content']
-	a = model.Article('Test', m)
-	assert(len(a.get_parents()) == 2)
-
-def parse_validarticle_returnsvalidchildren():
-	m = TestingModel()
-	m.content = ['{"Title": "TestTitle", "Abstract": "", "Parents": [], "Children": ["Children01"]}', 'Some content']
-	a = model.Article('Test', m)
-	assert(len(a.get_children()) == 1)
-
-def parse_validarticle_returnsvalidcontent():
-	m = TestingModel()
-	m.content = ['{"Title": "TestTitle", "Abstract": "", "Parents": ["Parent01", "Parent02"], "Children": []}', 'Some content']
-	a = model.Article('Test', m)
-	assert(a.get_content() == 'Some content')
-
-def savesource_validarticle_correctlyformatssource():
-	m = TestingModel()
-	m.content = ['{"Title": "TestTitle", "Abstract": "", "Parents": ["Parent01", "Parent02"], "Children": []}', 'Some content']
-	a = model.Article('Test', m)
-	a.save_source()
-	assert(m.saved_content['Test'] == '{"Abstract": "", "Parents": ["Parent01", "Parent02"], "Children": [], "Title": "TestTitle"}\nSome content')
-
-def model_getarticles_validsyntax():
-	m = TestingModel()
-	m.content = ['{"Title": "TestTitle", "Abstract": "", "Parents": ["Parent01", "Parent02"], "Children": []}', 'Some content']
-	assert(len(m.get_articles()) == 3)
+def articlereader_savearticle_savescorrectlyformattedarticle():
+	f = TestingFileManager()
+	a = model.ArticleReader(f)
+	article = model.Article("TestArticle", ["Parent01"], ["Children01", "Children02"], "This is the article content.")
+	a.save_article(article)
+	assert(f.source == '{\n"Title": "TestArticle",\n"Abstract": "", \n"Parents": ["Parent01"], \n"Children": ["Children01","Children02"] \n}\nThis is the article content.')
 
 
 
-parse_validarticle_returnsvalidtitle()
-parse_validarticle_returnsvalidparents()
-parse_validarticle_returnsvalidchildren()
-parse_validarticle_returnsvalidcontent()
-savesource_validarticle_correctlyformatssource()
-model_getarticles_validsyntax()
+articlereader_readarticle_validarticle_returnsvalidtitle()
+articlereader_readarticle_validarticle_returnsvalidparents()
+articlereader_readarticle_validarticle_returnsvalidchildren()
+articlereader_readarticle_validarticle_returnsvalidcontent()
+articlereader_savearticle_savescorrectlyformattedarticle()

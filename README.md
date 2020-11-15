@@ -5,3 +5,5 @@ Graph Navigation is a small project to create a tool that can generate static ht
 Each article generated is appended to the graph thanks to its `Parents` and `Children` articles. This provides an easy navigation as well as an easy understanding of how the articles are linked together.  
 
 Each article, stored under the `content/` folder is named with its title in a markdown format. It contains a JSON front-matter, describing its position in the graph (Parents, Children) as well as some extra information.
+
+An example is available on [computoms.com](http://computoms.com)

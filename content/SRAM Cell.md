@@ -3,7 +3,7 @@
     "Abstract": "",
     "Parents": ["Processor Cache Memories"],
     "Children": ["MOSFET Transistors"],
-    "Date": "2021-05-08"
+    "Date": "2020-07-27"
 }
 
 # Static Random Access Memory Cell

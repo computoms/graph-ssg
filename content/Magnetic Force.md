@@ -3,7 +3,7 @@
     "Abstract": "",
     "Parents": ["Magnetic Drives"],
     "Children": ["Fundamental Forces", "Electrons Spin"],
-    "Date": "2021-05-08"
+    "Date": "2020-06-01"
 }
 
 # Magnetic Force

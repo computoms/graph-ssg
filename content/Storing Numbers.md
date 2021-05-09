@@ -3,7 +3,7 @@
     "Abstract": "How to store numbers into the memory?",
     "Parents": ["Storing Information on a Computer"],
     "Children": ["Data Types", "Number Encodings"],
-    "Date": "2021-05-08"
+    "Date": "2020-10-05"
 }
 
 # Storing Numbers

@@ -3,7 +3,7 @@
     "Abstract": "",
     "Parents": ["Logic Circuits"],
     "Children": [""],
-    "Date": "2021-05-08"
+    "Date": "2020-06-29"
 }
 
 # NOT / Inverter Gate

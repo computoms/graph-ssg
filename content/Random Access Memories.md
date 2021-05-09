@@ -3,7 +3,7 @@
     "Abstract": "",
     "Parents": ["Computer Memories"],
     "Children": ["DRAM Cell"],
-    "Date": "2021-05-08"
+    "Date": "2020-09-07"
 }
 
 # Random Access Memories

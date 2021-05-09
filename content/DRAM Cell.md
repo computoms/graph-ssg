@@ -3,7 +3,7 @@
     "Abstract": "",
     "Parents": ["Random Access Memories"],
     "Children": ["MOSFET Transistors", "Capacitors"],
-    "Date": "2021-05-08"
+    "Date": "2020-08-24"
 }
 
 # Dynamic Random Access Memories

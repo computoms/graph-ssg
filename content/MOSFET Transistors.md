@@ -1,4 +1,9 @@
-{"Abstract": "", "Parents": ["DRAM Cell", "SRAM Cell", "Logic Circuits"], "Children": ["Electric Force"], "Title": "MOSFET Transistors", "Date": "2021-05-08"
+{
+	"Abstract": "", 
+	"Parents": ["DRAM Cell", "SRAM Cell", "Logic Circuits"], 
+	"Children": ["Electric Force"], 
+	"Title": "MOSFET Transistors", 
+	"Date": "2020-06-08"
 }
 
 # MOSFET Transistors

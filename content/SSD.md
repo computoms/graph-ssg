@@ -1,9 +1,9 @@
 {
-"Title": "SSD",
-"Abstract": "", 
-"Parents": ["Hard Drives"], 
-"Children": ["Floating-Gate Transistors","Logic Circuits"] ,
-    "Date": "2021-05-08"
+	"Title": "SSD",
+	"Abstract": "", 
+	"Parents": ["Hard Drives"], 
+	"Children": ["Floating-Gate Transistors","Logic Circuits"] ,
+    "Date": "2020-08-17"
 }
 
 

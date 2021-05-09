@@ -3,7 +3,7 @@
     "Abstract": "",
     "Parents": ["Computer Memories"],
     "Children": ["SRAM Cell"],
-    "Date": "2021-05-08"
+    "Date": "2020-09-14"
 }
 
 # Processor Cache Memories

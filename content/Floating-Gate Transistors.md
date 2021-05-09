@@ -1,4 +1,9 @@
-{"Abstract": "", "Parents": ["Flash Drives", "SSD"], "Children": ["Electric Force"], "Title": "Floating-Gate Transistors", "Date": "2021-05-08"
+{
+	"Abstract": "", 
+	"Parents": ["Flash Drives", "SSD"], 
+	"Children": ["Electric Force"], 
+	"Title": "Floating-Gate Transistors", 
+	"Date": "2020-07-20"
 }
 
 # Floating-Gate Transistors

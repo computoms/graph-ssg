@@ -1,4 +1,9 @@
-{"Abstract": "", "Parents": ["Flash Drives", "DRAM Cell"], "Children": ["Electric Force"], "Title": "Capacitors", "Date": "2021-05-08"
+{
+	"Abstract": "", 
+	"Parents": ["Flash Drives", "DRAM Cell"], 
+	"Children": ["Electric Force"], 
+	"Title": "Capacitors", 
+	"Date": "2020-07-13"
 }
 
 # Capacitors

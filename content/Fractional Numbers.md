@@ -3,7 +3,7 @@
     "Abstract": "",
     "Parents": ["Number Encodings"],
     "Children": ["Single Precision Numbers", "Double Precision Numbers"],
-    "Date": "2021-05-08"
+    "Date": "2020-10-26"
 }
 
 # Fractional Numbers

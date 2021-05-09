@@ -1,4 +1,9 @@
-{"Abstract": "", "Parents": ["MOSFET Transistors", "Capacitors", "Floating-Gate Transistors"], "Children": ["Fundamental Forces", "Electron Charge"], "Title": "Electric Force", "Date": "2021-05-08"
+{
+	"Abstract": "", 
+	"Parents": ["MOSFET Transistors", "Capacitors", "Floating-Gate Transistors"], 
+	"Children": ["Fundamental Forces", "Electron Charge"], 
+	"Title": "Electric Force", 
+	"Date": "2020-05-25"
 }
 
 # Electric Force

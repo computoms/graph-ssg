@@ -3,7 +3,7 @@
     "Abstract": "",
     "Parents": ["Computer Memories"],
     "Children": ["Magnetic Drives", "Flash Drives", "SSD"],
-    "Date": "2021-05-08"
+    "Date": "2020-08-31"
 }
 
 # Hard Drives

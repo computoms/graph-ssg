@@ -3,7 +3,7 @@
     "Abstract": "",
     "Parents": ["Hard Drives"],
     "Children": ["Magnetic Force", "Creating Magnetic Fields"],
-    "Date": "2021-05-08"
+    "Date": "2020-08-03"
 }
 
 # Magnetic Drives

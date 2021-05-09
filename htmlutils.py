@@ -1,6 +1,6 @@
 import model
 import markdown
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, FileSystemLoader
 import json
 
 class HtmlGenerator:
@@ -9,7 +9,7 @@ class HtmlGenerator:
 
 		
 	def get_template(self, template_name):
-		env = Environment(loader=PackageLoader('htmlutils', self.filemgr.template_location))
+		env = Environment(loader=FileSystemLoader(self.filemgr.template_location))
 		return env.get_template(template_name)
 
 

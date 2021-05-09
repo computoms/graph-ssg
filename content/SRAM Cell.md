@@ -11,7 +11,11 @@
 
 The SRAM is the main memory used as cache memory in processors. Its fundamental building block is composed of 6 transistors, that are connected to form 2 logic inverters (using 4 transistors) and 2 control transistors allowing to access the data for reading and writing. Below is the electrical schematic representing an SRAM cell.
 
-<img src="images/articles/SRAM-Cell.png" class="w3-center" width="60%" />
+<table class="w3-center" width="100%">
+	<tr><th>
+		<img src="images/articles/SRAM.svg" class="w3-center" width="90%" />
+	</th></tr>
+</table>
 
 M1, M2 and M3, M4 are the transistors that form the two inverters. M5 and M6 are the control transistors. To write a bit into the memory cell, the couple of inverters are forced into a state, either with <M1, M2> inverter output to high or low, by applying a slightly higher voltage that would normally be used for these components. Once the state has been written, it can be read by opening the transistors M5 and M6 and reading the lines BL and BL bar. 
 

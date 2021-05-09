@@ -68,11 +68,11 @@ class ArticleReader:
 
 
 class FileManager:
-	def __init__(self):
-		self.source_folder = "content/"
+	def __init__(self, inputFolder, outputFolder, templatesFolder):
+		self.source_folder = inputFolder
 		self.source_extension = ".md"
-		self.template_location = "templates/"
-		self.render_folder = "output/"
+		self.template_location = templatesFolder
+		self.render_folder = outputFolder
 		self.render_extension = ".html"
 		self.template_name = "page_template.html"
 		self.template_map = "map_template.html"

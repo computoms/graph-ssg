@@ -1,6 +1,6 @@
 import model
 import markdown
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, FileSystemLoader
 
 class HtmlGenerator:
 	def __init__(self, filemgr):
@@ -14,7 +14,7 @@ class HtmlGenerator:
 		    'graph': graph_svg
 		}	
 
-		env = Environment(loader=PackageLoader('htmlutils', self.filemgr.template_location))
+		env = Environment(loader=FileSystemLoader(self.filemgr.template_location))
 		page_template = env.get_template(self.filemgr.template_name)
 		content_html = page_template.render(post=data)
 
@@ -27,7 +27,7 @@ class HtmlGenerator:
 	    	'title': "Graph"
 		}
 
-		env = Environment(loader=PackageLoader('htmlutils', self.filemgr.template_location))
+		env = Environment(loader=FileSystemLoader(self.filemgr.template_location))
 		page_template = env.get_template(self.filemgr.template_map)
 		content_html = page_template.render(post=data)
 

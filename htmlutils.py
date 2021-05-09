@@ -11,7 +11,8 @@ class HtmlGenerator:
 		data = {
 		    'content': markdown.markdown(article.content),
 		    'title': article.title,
-		    'graph': graph_svg
+		    'graph': graph_svg,
+		    'publication_date': article.get_publication_date_pretty()
 		}	
 
 		env = Environment(loader=PackageLoader('htmlutils', self.filemgr.template_location))

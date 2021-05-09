@@ -43,3 +43,7 @@ The front matter of an article is a json object that is constructed as follows:
 }
 
 ```
+
+## Example
+
+You can find an example under the `example` sub-folder of the source directory. Running `python generator.py -f "./example/settings.json"` will generate the pages into the `./example/output/` directory.

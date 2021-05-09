@@ -1,0 +1,5 @@
+{
+	"input": "./example/content/",
+	"output": "./example/output/",
+	"templates": "./example/templates/"
+}

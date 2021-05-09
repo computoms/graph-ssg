@@ -9,7 +9,11 @@
 
 The DRAM is the main memory used as a working memory in computers. The fundamental building block of a DRAM is composed of a transistor -- that allows addressing the bit for reading / writting -- and a capacitor -- that stores the information. Its electrical schematic is shown below.
 
-<img src="images/articles/DRAM-Cell.png" class="w3-center" width="60%" />
+<table class="w3-center" width="100%">
+	<tr><th>
+		<img src="images/articles/DRAM.svg" class="w3-center" width="60%" />
+	</th></tr>
+</table>
 
 This consists of what is called a memory cell. Storing a bit -- 1 or 0 -- means charging or discharging the capacitor in this memory cell. To read the content of a cell, the transistor is opened and the capacitor current charge is read. These memory cells are usually arranged in a rectangle that can go to thousands of cells in width and height.
 

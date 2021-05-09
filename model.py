@@ -3,6 +3,7 @@ from os import walk
 from os import path
 import graph
 import filechanges
+import datetime
 
 
 def display(text):
@@ -11,11 +12,16 @@ def display(text):
 
 class Article:	
 
-	def __init__(self, title, parents, children, content):
+	def __init__(self, title, parents, children, publication_date, content):
 		self.title = title
 		self.parents = parents
 		self.children = children
 		self.content = content
+		self.publication_date = publication_date
+
+	def get_publication_date_pretty(self):
+		pub_date_obj = datetime.datetime.strptime(self.publication_date, "%Y-%m-%d")
+		return pub_date_obj.strftime("%B %d, %Y")
 
 class ArticleReader:
 	def __init__(self, filemgr):
@@ -27,7 +33,7 @@ class ArticleReader:
 
 		source_lines = self.filemgr.get_source_content(name)
 		if len(source_lines) == 0:
-			return Article("None", [], [], "")
+			return Article("None", [], [], "", "")
 
 		is_font_matter = False
 		open_count = 0
@@ -51,7 +57,7 @@ class ArticleReader:
 					is_font_matter = False
 
 		json = jsonlib.loads(source_json)
-		return Article(json['Title'], json['Parents'], json['Children'], source_markdown)
+		return Article(json['Title'], json['Parents'], json['Children'], json['Date'], source_markdown)
 
 	def get_frontmatter_json(self, article):
 		s = '","'
@@ -59,7 +65,8 @@ class ArticleReader:
 		+ '"Title": "' + article.title + '",\n' \
 		+ '"Abstract": "", \n' \
 		+ '"Parents": ["' + s.join([p for p in article.parents]) + '"], \n' \
-		+ '"Children": ["' + s.join([c for c in article.children]) + '"] \n' \
+		+ '"Children": ["' + s.join([c for c in article.children]) + '"], \n' \
+		+ '"Date": "' + article.publication_date + '" \n' \
 		+ '}'
 
 	def save_article(self, article):
@@ -76,6 +83,7 @@ class FileManager:
 		self.render_extension = ".html"
 		self.template_name = "page_template.html"
 		self.template_map = "map_template.html"
+		self.template_news = "news_template.html"
 		self.change_register = filechanges.FileChangeRegister("changes.txt")
 		self.file_filters = [".DS_Store"]
 
@@ -136,7 +144,8 @@ class FileLinker:
 		self.open_editor_on_create = True
 
 	def create_empty_source_file(self, title, parents):
-		article = Article(title, parents, [], '# ' + title)
+		d = date.today().strftime("%Y-%m-%d")
+		article = Article(title, parents, [], d, '# ' + title)
 		self.article_reader.save_article(article)
 
 	def open_editor(self, title):

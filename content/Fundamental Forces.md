@@ -26,7 +26,7 @@ The _mass_ is one of the few intrinsic characteristics of matter. This property 
 
 IF you hold an apple with your hand and suddenly drop it, it will fall down on the floor. This is due to what we call its "weight", which is a force applied by the Earth onto the apple. Two masses attract each other with a force that is proportional to their distance and to their masses:
 
-W = G. (m1m2)/r^2
+`W = G. (m1m2)/r^2`
 
 ## Sub-atomic forces
 

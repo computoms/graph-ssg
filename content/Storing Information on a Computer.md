@@ -9,10 +9,18 @@
 		]
 }
 
-Storing information on a computer
-Computer programs need to store and get access to information on computer memories. Below is an explanation of the process that take place when storing different data.
+# Storing information on a computer
 
-Storing Characters: How to store characters into the memory?
+Computer programs need to store and get access information on computer memories. But how exactly does that happen? What are the mechanisms behind data storing in a computer?
 
-Storing Numbers: How to store numbers into the memory?
+## Storing Characters
 
+How do we store texts, sentences and characters into the memory?
+
+## Storing Numbers
+
+How do we store numbers?
+
+## Computer Memories
+
+What is a computer memory? From what is it made? How does it work?

@@ -2,10 +2,7 @@
     "Title": "Storing Characters",
     "Abstract": "How to store characters into the memory?",
     "Parents": ["Storing Information on a Computer"],
-    "Children": [
-    	"ASCII", 
-    	"UTF"
-    	]
+    "Children": ["ASCII", "UTF"]
 }
 
 # Storing Characters

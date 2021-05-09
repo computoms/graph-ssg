@@ -4,4 +4,4 @@ output/
 content/.DS_Store
 publish-settings.json
 *.DS_Store
-changes.txt
+.build/

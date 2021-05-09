@@ -2,10 +2,14 @@ import hashlib
 import os
 
 class FileChangeRegister:
-	def __init__(self, database_file):
-		self.change_db = database_file
-		if not os.path.isfile(database_file):
-			with open(database_file, "w") as file:
+	def __init__(self, outputFolder):
+		# Generate unique name based on outputFolder to register the file changes
+		db_hash = hashlib.md5(outputFolder).hexdigest()
+		self.change_db = ".build/" + str(db_hash)
+		if not os.path.isdir(".build"):
+			os.mkdir(".build")
+		if not os.path.isfile(self.change_db):
+			with open(self.change_db, "w") as file:
 				file.write("\n")
 
 	def read_registers(self):

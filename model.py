@@ -84,7 +84,7 @@ class FileManager:
 		self.template_name = "page_template.html"
 		self.template_map = "map_template.html"
 		self.template_news = "news_template.html"
-		self.change_register = filechanges.FileChangeRegister("changes.txt")
+		self.change_register = filechanges.FileChangeRegister(outputFolder)
 		self.file_filters = [".DS_Store"]
 
 

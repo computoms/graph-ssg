@@ -16,12 +16,12 @@ You can use this program by running the following command:
 
 Before running the command, you must create a file `settings.json` that contains the following information:
 
-```md
-    {
-		"input": "/path/to/article/sources/",
-		"output": "/path/to/output/directory/",
-		"templates": "/path/to/template/directory/"
-	}
+```json
+{
+	"input": "/path/to/article/sources/",
+	"output": "/path/to/output/directory/",
+	"templates": "/path/to/template/directory/"
+}
 ```
 
 The source directory contains the articles in markdown format. In the template directory, you should create these three template files:
@@ -34,12 +34,12 @@ The source directory contains the articles in markdown format. In the template d
 The front matter of an article is a json object that is constructed as follows:
 
 ```json
-	{
-		"Title": "Article title",
-		"Abstract": "Article abstract",
-		"Parents": ["Parent1", "Parent2"],
-		"Children": ["Children1", "Children2"],
-		"Date": "2020-04-01"
-	}
+{
+	"Title": "Article title",
+	"Abstract": "Article abstract",
+	"Parents": ["Parent1", "Parent2"],
+	"Children": ["Children1", "Children2"],
+	"Date": "2020-04-01"
+}
 
 ```

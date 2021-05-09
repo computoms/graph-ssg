@@ -1,7 +1,4 @@
 _archive.zip
-output/
 *.pyc
-content/.DS_Store
-publish-settings.json
 *.DS_Store
 .build/

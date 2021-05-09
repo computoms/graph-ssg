@@ -2,7 +2,8 @@
     "Title": "Double Precision Numbers",
     "Abstract": "",
     "Parents": ["Fractional Numbers"],
-    "Children": [""]
+    "Children": [""],
+    "Date": "2021-05-08"
 }
 
 # Double Precision Numbers

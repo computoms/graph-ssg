@@ -2,7 +2,8 @@
 "Title": "Logic Circuits",
 "Abstract": "", 
 "Parents": ["Computer Memories","SSD"], 
-"Children": ["NOT Gate","AND Gate","OR Gate","MOSFET Transistors"] 
+"Children": ["NOT Gate","AND Gate","OR Gate","MOSFET Transistors"] ,
+    "Date": "2021-05-08"
 }
 
 

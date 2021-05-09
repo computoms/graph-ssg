@@ -2,7 +2,8 @@
     "Title": "Magnetic Force",
     "Abstract": "",
     "Parents": ["Magnetic Drives"],
-    "Children": ["Fundamental Forces", "Electrons Spin"]
+    "Children": ["Fundamental Forces", "Electrons Spin"],
+    "Date": "2021-05-08"
 }
 
 # Magnetic Force

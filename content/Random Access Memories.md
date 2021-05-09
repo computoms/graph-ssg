@@ -2,7 +2,8 @@
     "Title": "Random Access Memories",
     "Abstract": "",
     "Parents": ["Computer Memories"],
-    "Children": ["DRAM Cell"]
+    "Children": ["DRAM Cell"],
+    "Date": "2021-05-08"
 }
 
 # Random Access Memories

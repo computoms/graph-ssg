@@ -2,7 +2,8 @@
     "Title": "Creating Magnetic Fields",
     "Abstract": "",
     "Parents": ["Magnetic Drives"],
-    "Children": [""]
+    "Children": [""],
+    "Date": "2021-05-08"
 }
 
 # Creating Magnetic Fields

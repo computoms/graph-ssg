@@ -2,7 +2,8 @@
     "Title": "Electrons Spin",
     "Abstract": "",
     "Parents": ["Magnetic Force"],
-    "Children": [""]
+    "Children": [""],
+    "Date": "2021-05-08"
 }
 
 # Electrons Spin

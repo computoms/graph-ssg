@@ -2,7 +2,8 @@
     "Title": "Data Types",
     "Abstract": "",
     "Parents": ["Storing Numbers"],
-    "Children": [""]
+    "Children": [""],
+    "Date": "2021-05-08"
 }
 
 # Data Types

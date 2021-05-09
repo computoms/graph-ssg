@@ -2,7 +2,8 @@
     "Title": "DRAM Cell",
     "Abstract": "",
     "Parents": ["Random Access Memories"],
-    "Children": ["MOSFET Transistors", "Capacitors"]
+    "Children": ["MOSFET Transistors", "Capacitors"],
+    "Date": "2021-05-08"
 }
 
 # Dynamic Random Access Memories

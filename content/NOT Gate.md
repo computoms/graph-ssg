@@ -2,7 +2,8 @@
     "Title": "NOT Gate",
     "Abstract": "",
     "Parents": ["Logic Circuits"],
-    "Children": [""]
+    "Children": [""],
+    "Date": "2021-05-08"
 }
 
 # NOT / Inverter Gate

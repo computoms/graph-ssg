@@ -2,7 +2,8 @@
     "Title": "Hard Drives",
     "Abstract": "",
     "Parents": ["Computer Memories"],
-    "Children": ["Magnetic Drives", "Flash Drives", "SSD"]
+    "Children": ["Magnetic Drives", "Flash Drives", "SSD"],
+    "Date": "2021-05-08"
 }
 
 # Hard Drives

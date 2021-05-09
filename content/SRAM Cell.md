@@ -2,7 +2,8 @@
     "Title": "SRAM Cell",
     "Abstract": "",
     "Parents": ["Processor Cache Memories"],
-    "Children": ["MOSFET Transistors"]
+    "Children": ["MOSFET Transistors"],
+    "Date": "2021-05-08"
 }
 
 # Static Random Access Memory Cell

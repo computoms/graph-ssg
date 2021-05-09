@@ -2,7 +2,9 @@
 	"Abstract": "Computer memories to store computing data", 
 	"Parents": ["Storing Information on a Computer"], 
 	"Children": ["Hard Drives", "Random Access Memories", "Processor Cache Memories", "Logic Circuits"], 
-	"Title": "Computer Memories"}
+	"Title": "Computer Memories",
+    "Date": "2021-05-08"
+}
 
 # Computer Memories
 

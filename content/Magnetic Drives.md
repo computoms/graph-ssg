@@ -2,7 +2,8 @@
     "Title": "Magnetic Drives",
     "Abstract": "",
     "Parents": ["Hard Drives"],
-    "Children": ["Magnetic Force", "Creating Magnetic Fields"]
+    "Children": ["Magnetic Force", "Creating Magnetic Fields"],
+    "Date": "2021-05-08"
 }
 
 # Magnetic Drives

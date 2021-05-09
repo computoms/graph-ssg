@@ -2,7 +2,8 @@
 "Title": "SSD",
 "Abstract": "", 
 "Parents": ["Hard Drives"], 
-"Children": ["Floating-Gate Transistors","Logic Circuits"] 
+"Children": ["Floating-Gate Transistors","Logic Circuits"] ,
+    "Date": "2021-05-08"
 }
 
 

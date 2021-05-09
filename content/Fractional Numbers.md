@@ -2,7 +2,8 @@
     "Title": "Fractional Numbers",
     "Abstract": "",
     "Parents": ["Number Encodings"],
-    "Children": ["Single Precision Numbers", "Double Precision Numbers"]
+    "Children": ["Single Precision Numbers", "Double Precision Numbers"],
+    "Date": "2021-05-08"
 }
 
 # Fractional Numbers

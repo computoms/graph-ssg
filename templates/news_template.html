@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<title>{{ post.title }}</title>
+<title>What's new</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -42,25 +42,16 @@ body {font-family: "Quicksand", sans-serif; font-size: 15pt;}
 
   <div class="w3-light-gray">
     <div class="w3-container w3-content w3-padding-32">
-      <h1>Complete Map of Articles</h1>
+      <h1>What's new</h1>
       <p>
-      The aim of this blog is to explain how a computer program works, from the high level architecture (program windows and buttons) to the very low-level components that form a computer.
+        Below is the list of the most recent articles. <br/>
+        There are {{ articles|length }} articles in the news feed.
       </p>
-      <p>
-      Rather than just presenting this information as a plain text bloc, the idea of this website is to present the information in a structured manner. Similarly to how we would think of the different parts that compose a program and how we would go from high-level abstractions to low-level details; the information presented go from high-level concepts (such as <a href="Storing Information on a Computer.html">how to store information in a computer?</a>) to low-level concepts (such as <a href="MOSFET Transistors.html">transistors</a> and <a href="Electric Force.html">electric forces</a>).  
-      </p>
-      <p>
-        Below is presented the complete map of articles and their relationships with each other. Click on an article title to begin reading.
-      </p>
-      <h2>Most recent articles</h2>
-      <p>Read the most recent articles <a href="news.html">here</a>.</p>
-    </div>
-  </div>
-
-  <!-- The Graph Section -->
-  <div id="tour" style="overflow-x: scroll;">
-    <div class="w3-container w3-content w3-padding-32">
-      {{ post.graph }}
+      {% for article in articles %}
+        <div>
+          <p>{{ article.publication_date }}   -  <a href="{{ article.title }}.html">{{ article.title }}</a></p>
+        </div>
+      {% endfor %}
     </div>
   </div>
 

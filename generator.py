@@ -2,6 +2,7 @@ import model as modellib
 import htmlutils
 import graph
 import shutil
+import collections
 
 
 filemgr = modellib.FileManager()
@@ -22,11 +23,22 @@ def generate_sources():
 		graph_svg = graph_generator.generate(article)
 		html_generator.generate_article(article, graph_svg)
 
+def generate_news():
+	print("Generating news feed...")
+	article_names = filemgr.list_source()
+	articles = []
+	for name in article_names:
+		article = reader.read_article(name)
+		articles.append(article)
+
+	articles.sort(key=lambda x: x.publication_date, reverse=True)
+	html_generator.generate_news(articles)
+
 
 def generate_fixed_pages():
 	shutil.copyfile('templates/index.html', filemgr.render_folder + "index.html")
 	html_generator.generate_map(graph_generator.generate_full(filemgr.list_source()))
-
+	generate_news()
 
 if len(filemgr.list_changed_source()) == 0:
 	print('Nothing changed.')

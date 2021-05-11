@@ -12,12 +12,13 @@ def display(text):
 
 class Article:	
 
-	def __init__(self, title, parents, children, publication_date, content):
+	def __init__(self, title, parents, children, publication_date, abstract, content):
 		self.title = title
 		self.parents = parents
 		self.children = children
 		self.content = content
 		self.publication_date = publication_date
+		self.abstract = abstract
 
 	def get_publication_date_pretty(self):
 		pub_date_obj = datetime.datetime.strptime(self.publication_date, "%Y-%m-%d")
@@ -57,13 +58,13 @@ class ArticleReader:
 					is_font_matter = False
 
 		json = jsonlib.loads(source_json)
-		return Article(json['Title'], json['Parents'], json['Children'], json['Date'], source_markdown)
+		return Article(json['Title'], json['Parents'], json['Children'], json['Date'], json['Abstract'], source_markdown)
 
 	def get_frontmatter_json(self, article):
 		s = '","'
 		return '{\n' \
 		+ '"Title": "' + article.title + '",\n' \
-		+ '"Abstract": "", \n' \
+		+ '"Abstract": "' + article.abstract + '", \n' \
 		+ '"Parents": ["' + s.join([p for p in article.parents]) + '"], \n' \
 		+ '"Children": ["' + s.join([c for c in article.children]) + '"], \n' \
 		+ '"Date": "' + article.publication_date + '" \n' \

@@ -19,7 +19,8 @@ class HtmlGenerator:
 		    'content': markdown.markdown(article.content),
 		    'title': article.title,
 		    'graph': graph_svg,
-		    'publication_date': article.get_publication_date_pretty()
+		    'publication_date': article.get_publication_date_pretty(),
+		    'abstract': article.abstract
 		}	
 
 		page_template = self.get_template(self.filemgr.template_name)

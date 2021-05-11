@@ -1,6 +1,6 @@
-# Graph Navigation
+# Graph Static Site Generator
 
-Graph Navigation is a small python program aimed at generating static html pages ordered in the form of a graph of articles.
+`graph-ssg` is a small python program aimed at generating static html pages ordered in the form of a graph of articles.
 
 Each article generated is appended to the graph thanks to its `Parents` and `Children` articles. This provides an easy navigation as well as an easy understanding of how the articles are linked together.  
 
@@ -12,7 +12,7 @@ An example is available on [computoms.com](http://computoms.com).
 ## Usage
 
 You can use this program by running the following command:
-`python generator.py "/path/to/settings.json"`
+`python build.py -f "/path/to/settings.json"`
 
 Before running the command, you must create a file `settings.json` that contains the following information:
 
@@ -46,4 +46,4 @@ The front matter of an article is a json object that is constructed as follows:
 
 ## Example
 
-You can find an example under the `example` sub-folder of the source directory. Running `python generator.py -f "./example/settings.json"` will generate the pages into the `./example/output/` directory.
+You can find an example under the `example` sub-folder of the source directory. Running `python build.py -f "./example/settings.json"` will generate the pages into the `./example/output/` directory.

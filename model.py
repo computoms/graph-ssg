@@ -1,6 +1,7 @@
 import json as jsonlib
 from os import walk
 from os import path
+from os import system
 import graph
 import filechanges
 import datetime
@@ -145,13 +146,13 @@ class FileLinker:
 		self.open_editor_on_create = True
 
 	def create_empty_source_file(self, title, parents):
-		d = date.today().strftime("%Y-%m-%d")
-		article = Article(title, parents, [], d, '# ' + title)
+		d = datetime.date.today().strftime("%Y-%m-%d")
+		article = Article(title, parents, [], d, '# ' + title, '')
 		self.article_reader.save_article(article)
 
 	def open_editor(self, title):
 		filename = self.filemgr.get_full_path(title)
-		os.system('subl "' + filename + '"')
+		system('subl "' + filename + '"')
 
 	# Create new, missing files
 	def create_new_files(self):

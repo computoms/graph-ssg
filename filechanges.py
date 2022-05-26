@@ -4,7 +4,7 @@ import os
 class FileChangeRegister:
 	def __init__(self, outputFolder):
 		# Generate unique name based on outputFolder to register the file changes
-		db_hash = hashlib.md5(outputFolder).hexdigest()
+		db_hash = hashlib.md5(outputFolder.encode('utf-8')).hexdigest()
 		self.change_db = ".build/" + str(db_hash)
 		if not os.path.isdir(".build"):
 			os.mkdir(".build")

@@ -1,25 +1,38 @@
 import hashlib
 import os
 
-class FileChangeRegister:
-	def __init__(self, outputFolder):
-		# Generate unique name based on outputFolder to register the file changes
-		db_hash = hashlib.md5(outputFolder.encode('utf-8')).hexdigest()
-		self.change_db = ".build/" + str(db_hash)
-		if not os.path.isdir(".build"):
-			os.mkdir(".build")
-		if not os.path.isfile(self.change_db):
-			with open(self.change_db, "w") as file:
+# IO Access to disk
+class File:
+	def __init__(self, path):
+		self.path = path
+
+	def get_lines(self):
+		with open(self.path, "r") as file:
+			return file.readlines()
+
+	def write_content(self, content):
+		with open(self.path, "w") as file:
+			file.write(content)
+
+	def assert_file(self):
+		if not os.path.isfile(self.path):
+			with open(self.path, "w") as file:
 				file.write("\n")
+
+# Handles file change monitoring
+class FileChangeRegister:
+	def __init__(self, change_database):
+		# Generate unique name based on outputFolder to register the file changes
+		self.change_db = change_database
+		self.change_db.assert_file()
 
 	def read_registers(self):
 		registers = {}
-		with open(self.change_db, "r") as file:
-			lines = file.readlines()
-			for line in lines:
-				s = line.split(',')
-				if (len(s) > 1):
-					registers[s[0]] = s[1]
+		lines = self.change_db.get_lines()
+		for line in lines:
+			s = line.split(',')
+			if (len(s) > 1):
+				registers[s[0]] = s[1]
 		return registers
 
 	def write_registers(self, registers):
@@ -27,8 +40,7 @@ class FileChangeRegister:
 		for k in registers:
 			csv_content += k + "," + registers[k] + "\n"
 
-		with open(self.change_db, "w") as file:
-			file.write(csv_content)
+		self.change_db.write_content(csv_content)
 
 	def compute_hash(self, filename):
 		if not os.path.exists(filename):
@@ -46,4 +58,5 @@ class FileChangeRegister:
 		if filename in registers:
 			return registers[filename].rstrip() != new_hash
 		else:
+			self.update(filename)
 			return True

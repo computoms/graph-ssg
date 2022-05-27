@@ -1,10 +1,10 @@
 import json as jsonlib
-from os import walk
+import os
 from os import path
 from os import system
-import graph
 import filechanges
 import datetime
+import hashlib
 
 
 def display(text):
@@ -86,7 +86,12 @@ class FileManager:
 		self.template_name = "page_template.html"
 		self.template_map = "map_template.html"
 		self.template_news = "news_template.html"
-		self.change_register = filechanges.FileChangeRegister(outputFolder)
+
+		if not path.isdir(".build"):
+			os.mkdir(".build")
+		db_hash = hashlib.md5(outputFolder.encode('utf-8')).hexdigest()
+		change_db = filechanges.File(".build/" + str(db_hash))
+		self.change_register = filechanges.FileChangeRegister(change_db)
 		self.file_filters = [".DS_Store"]
 
 

@@ -87,6 +87,7 @@ class FileManager:
 		self.template_map = "map_template.html"
 		self.template_news = "news_template.html"
 
+		# Generate unique name based on outputFolder to register the file changes
 		if not path.isdir(".build"):
 			os.mkdir(".build")
 		db_hash = hashlib.md5(outputFolder.encode('utf-8')).hexdigest()

@@ -24,7 +24,7 @@ class TestingFileManager:
 		return name
 
 	def get_source_content(self, name):
-		return '{"Title": "Test", "Abstract": "", "Children": ["Children01", "Children02"], "Parents": ["Parent01"]} Content'
+		return '{"Title": "Test", "Abstract": "", "Children": ["Children01", "Children02"], "Parents": ["Parent01"], "Date": "2020-01-02"} Content'
 
 	def set_source_content(self, name, content):
 		self.source = content
@@ -65,9 +65,9 @@ class ArticleReaderTest:
 	def savearticle_savescorrectlyformattedarticle(self):
 		f = TestingFileManager()
 		a = model.ArticleReader(f)
-		article = model.Article("TestArticle", ["Parent01"], ["Children01", "Children02"], "This is the article content.")
+		article = model.Article("TestArticle", ["Parent01"], ["Children01", "Children02"], "2020-01-01", "", "This is the article content.")
 		a.save_article(article)
-		assert(f.source == '{\n"Title": "TestArticle",\n"Abstract": "", \n"Parents": ["Parent01"], \n"Children": ["Children01","Children02"] \n}\nThis is the article content.')
+		assert(f.source == '{\n"Title": "TestArticle",\n"Abstract": "", \n"Parents": ["Parent01"], \n"Children": ["Children01","Children02"], \n"Date": "2020-01-01" \n}\nThis is the article content.')
 
 
 class TestingFileManagerForLinks:
@@ -114,8 +114,8 @@ class TestingFileManagerForLinks:
 class FileLinkerTest:
 	def updatechildren_parentwithnochildren_updatesparentwithonechildren(self):
 		f = TestingFileManagerForLinks()
-		f.articles.append(model.Article("Parent01", [], [], ""))
-		f.articles.append(model.Article("Children01", ["Parent01"], [], ""))
+		f.articles.append(model.Article("Parent01", [], [], "2020-01-01", "", ""))
+		f.articles.append(model.Article("Children01", ["Parent01"], [], "2020-01-01", "", ""))
 		reader = model.ArticleReader(f)
 		linker = model.FileLinker(f, reader)
 		linker.update_children()
@@ -123,8 +123,8 @@ class FileLinkerTest:
 
 	def updateparent_childrenwithnoparent_updateschildrenwithoneparent(self):
 		f = TestingFileManagerForLinks()
-		f.articles.append(model.Article("Parent01", [], ["Children01"], ""))
-		f.articles.append(model.Article("Children01", [], [], ""))
+		f.articles.append(model.Article("Parent01", [], ["Children01"], "", "", ""))
+		f.articles.append(model.Article("Children01", [], [], "", "", ""))
 		reader = model.ArticleReader(f)
 		linker = model.FileLinker(f, reader)
 		linker.update_parents()
@@ -132,7 +132,7 @@ class FileLinkerTest:
 
 	def createnewfiles_parentwithinexistantchildren_createsnewchildren(self):
 		f = TestingFileManagerForLinks()
-		f.articles.append(model.Article("Parent01", [], ["Children01"], ""))
+		f.articles.append(model.Article("Parent01", [], ["Children01"], "", "", ""))
 		reader = model.ArticleReader(f)
 		linker = model.FileLinker(f, reader)
 		linker.open_editor_on_create = False
@@ -142,7 +142,7 @@ class FileLinkerTest:
 
 	def createnewfiles_childwithinexistingparent_createsnewparent(self):
 		f = TestingFileManagerForLinks()
-		f.articles.append(model.Article("Children01", ["Parent01"], [], ""))
+		f.articles.append(model.Article("Children01", ["Parent01"], [], "", "", ""))
 		reader = model.ArticleReader(f)
 		linker = model.FileLinker(f, reader)
 		linker.open_editor_on_create = False

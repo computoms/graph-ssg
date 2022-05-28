@@ -1,9 +1,16 @@
+import os
 import model
+import article
 
-class FileManagerMock:
+class FileManagerMock(model.FileManager):
 	def __init__(self):
 		self.source = ""
 		self.output = ""
+
+	def create_article_file(self, name):
+		source = name + '.md'
+		output = name + '.html'
+		return article.ArticleFile(name, source, output)
 
 	def apply_filter(self, source_file):
 		for filt in self.file_filters:
@@ -12,7 +19,7 @@ class FileManagerMock:
 		return True
 
 	def list_source(self):
-		return ['Source01', 'Source02', 'Source03']
+		return [self.create_article_file('Source01'), self.create_article_file('Source02'), self.create_article_file('Source03')]
 
 	def list_changed_source(self):
 		return ['Source02']
@@ -32,26 +39,25 @@ class FileManagerMock:
 	def save_output(self, name, content):
 		self.output = content
 
-class FileManagerMockForLinks:
+class FileManagerMockForLinks(model.FileManager):
 	def __init__(self):
 		self.articles = []
 		self.source = {}
 		self.output = ""
 
-	def apply_filter(self, source_file):
-		for filt in self.file_filters:
-			if filt in source_file:
-				return False
-		return True
+	def create_article_file(self, name):
+		source = name + '.md'
+		output = name + '.html'
+		return article.ArticleFile(name, source, output)
 
 	def list_source(self):
-		return [article.title for article in self.articles]
+		return [self.create_article_file(article.title) for article in self.articles]
 
 	def list_changed_source(self):
 		return self.list_source(self)
 
 	def exists(self, name):
-		return name in self.list_source()
+		return name in [s.name for s in self.list_source()]
 
 	def get_full_path(self, name):
 		return name
@@ -61,8 +67,8 @@ class FileManagerMockForLinks:
 			if article.title == name:
 				return article
 
-	def get_source_content(self, name):
-		article = self.get_article_internal(name)
+	def get_source_content(self, file):
+		article = self.get_article_internal(file.name)
 		a = model.ArticleReader(self)
 		content = a.get_frontmatter_json(article) + "\n" + article.content
 		return content

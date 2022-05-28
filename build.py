@@ -69,21 +69,21 @@ def main(argv):
 
 	def generate_sources(changed_sources):
 		print(str(len(changed_sources)) + " articles changed.")
-		for name in changed_sources:
-			if not filemgr.exists(name):
-				filemgr.delete_article(name)
+		for file in changed_sources:
+			if not filemgr.exists(file.name):
+				filemgr.delete_article(file)
 				continue
-			article = reader.read_article(name)
+			article = reader.read_article(file.name)
 			graph_svg = graph_generator.generate(article)
 			html_generator.generate_article(article, graph_svg)
 
 
 	def generate_news():
 		print("Generating news feed...")
-		article_names = filemgr.list_source()
+		article_files = filemgr.list_source()
 		articles = []
-		for name in article_names:
-			article = reader.read_article(name)
+		for file in article_files:
+			article = reader.read_article(file.name)
 			articles.append(article)
 
 		articles.sort(key=lambda x: x.publication_date, reverse=True)

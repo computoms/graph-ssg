@@ -1,10 +1,12 @@
 import hashlib
 import os
 import json
+import article
 
 # Data representing the state of a file (source / destination)
 class FileState:
-	def __init__(self, source, destination, source_hash, destination_hash) -> None:
+	def __init__(self, name, source, destination, source_hash, destination_hash) -> None:
+		self.name = name
 		self.source = source
 		self.destination = destination
 		self.source_hash = source_hash
@@ -24,10 +26,10 @@ class FileStateGetter:
 			return ""
 		return hashlib.md5(open(filename,'rb').read()).hexdigest()
 
-	def get(self, source, destination):
+	def get(self, name, source, destination):
 		src_hash = self.compute_hash(source)
 		dst_hash = self.compute_hash(destination)
-		return FileState(source, destination, src_hash, dst_hash)
+		return FileState(name, source, destination, src_hash, dst_hash)
 
 	def exists(self, file):
 		return os.path.isfile(file)
@@ -49,7 +51,7 @@ class FileStateDatabasePersistence:
 			states = {}
 			for s in content:
 				state_dict = content[s]
-				states[s] = FileState(state_dict['source'], state_dict['destination'], state_dict['source_hash'], state_dict['destination_hash'])
+				states[s] = FileState(state_dict['name'], state_dict['source'], state_dict['destination'], state_dict['source_hash'], state_dict['destination_hash'])
 			return states
 
 # Store file states
@@ -72,8 +74,8 @@ class FileStateDatabase:
 		del self.states[name]
 		self.persistence.save(self.states)
 	
-	def get_deleted(self, all_names):
-		return list(filter(lambda x: x not in all_names, self.states))
+	def get_deleted_states(self, all_names):
+		return [self.states[n] for n in filter(lambda x: x not in all_names, self.states)]
 
 # Monitors files states
 class FileStateMonitor:
@@ -82,31 +84,33 @@ class FileStateMonitor:
 		self.destination_folder = destination_folder
 		self.state_getter = FileStateGetter()
 
-	def get_destination(self, source):
-		dest = os.path.join(self.destination_folder, os.path.basename(source).replace('.md', '') + ".html")
-		return dest
-
-	def has_changed(self, name):
-		if not self.database.exists(name):
+	def has_changed(self, file):
+		if not self.database.exists(file.name):
+			return True
+		if file.is_template:
 			return True
 
-		last_state = self.database.get(name)
-		current_state = self.state_getter.get(last_state.source, last_state.destination)
+		last_state = self.database.get(file.name)
+		current_state = self.state_getter.get(last_state.name, last_state.source, last_state.destination)
 		return last_state.source_hash != current_state.source_hash or last_state.destination_hash != current_state.destination_hash
 
-	def update(self, name, source_filename):
-		if not self.state_getter.exists(source_filename) and self.database.exists(name):
-			self.database.remove(name)
+	def update(self, file):
+		if not self.state_getter.exists(file.source) and self.database.exists(file.name):
+			self.database.remove(file.name)
 			return
 
-		current_state = self.state_getter.get(source_filename, self.get_destination(source_filename))
-		self.database.update(name, current_state)
-	
-	def get_changed_files(self, all_names):
-		deleted = self.database.get_deleted(all_names)
-		existing_files = filter(lambda x: x not in deleted, all_names)
-		changed = list(filter(lambda x: self.has_changed(x), existing_files))
-		return deleted + changed
+		if file.is_template:
+			return
 
-	def remove(self, name):
-		self.database.remove(name)
+		current_state = self.state_getter.get(file.name, file.source, file.output)
+		self.database.update(file.name, current_state)
+	
+	def get_changed_files(self, all_files):
+		deleted_states = self.database.get_deleted_states([f.name for f in all_files])
+		deleted_files = [article.ArticleFile(s.name, s.source, s.destination) for s in deleted_states]
+		existing_files = filter(lambda x: x.name not in deleted_files, all_files)
+		changed_files = list(filter(lambda x: self.has_changed(x), existing_files))
+		return deleted_files + changed_files
+
+	def remove(self, file):
+		self.database.remove(file.name)

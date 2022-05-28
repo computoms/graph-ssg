@@ -14,13 +14,13 @@ class GraphGenerator:
 		g = Digraph(name='Full Map', \
 			node_attr={'color': 'green', 'style': 'filled', 'shape': 'box', 'fontcolor': 'white'}, \
 			edge_attr={'arrowhead': 'none', 'arrowtail': 'dot'})
-		for title in articles:
-			g.node(title, href=title + '.html')
-		for title in articles:
-			article = self.article_reader.read_article(title)
+		for file in articles:
+			g.node(file.name, href=file.name + '.html')
+		for file in articles:
+			article = self.article_reader.read_article(file.name)
 			for child_title in article.children:
 				if child_title != "":
-					g.edge(title, child_title)
+					g.edge(file.name, child_title)
 		g.format = 'svg'
 		return g.pipe().decode('utf-8')
 

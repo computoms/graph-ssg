@@ -6,25 +6,14 @@ from os import walk
 import filechanges
 import datetime
 import hashlib
+from article import Article
+import article
 
 
 def display(text):
 	print(text)
 
 
-class Article:	
-
-	def __init__(self, title, parents, children, publication_date, abstract, content):
-		self.title = title
-		self.parents = parents
-		self.children = children
-		self.content = content
-		self.publication_date = publication_date
-		self.abstract = abstract
-
-	def get_publication_date_pretty(self):
-		pub_date_obj = datetime.datetime.strptime(self.publication_date, "%Y-%m-%d")
-		return pub_date_obj.strftime("%B %d, %Y")
 
 class ArticleReader:
 	def __init__(self, filemgr):
@@ -34,7 +23,7 @@ class ArticleReader:
 		source_markdown = ""
 		source_json = ""
 
-		source_lines = self.filemgr.get_source_content(name)
+		source_lines = self.filemgr.get_source_content(self.filemgr.create_article_file(name))
 		if len(source_lines) == 0:
 			return Article("None", [], [], "", "", "")
 
@@ -76,7 +65,6 @@ class ArticleReader:
 		content = self.get_frontmatter_json(article) + "\n" + article.content
 		self.filemgr.set_source_content(article.title, content)
 
-
 class FileManager:
 	def __init__(self, inputFolder, outputFolder, templatesFolder):
 		self.source_folder = inputFolder
@@ -97,6 +85,18 @@ class FileManager:
 		self.state_monitor = filechanges.FileStateMonitor(db, outputFolder)
 		self.file_filters = [".DS_Store"]
 
+	def create_article_file(self, name):
+		source = os.path.join(self.source_folder, name + self.source_extension)
+		output = os.path.join(self.render_folder, name + self.render_extension)
+		return article.ArticleFile(name, source, output)
+
+	def create_template_file(self, name, template_path):
+		source = os.path.join(self.template_location, template_path)
+		output = os.path.join(self.render_folder, name + self.render_extension)
+		file = article.ArticleFile(name, source, output)
+		file.is_template = True
+		return file
+
 	def apply_filter(self, source_file):
 		for filt in self.file_filters:
 			if filt in source_file:
@@ -108,42 +108,38 @@ class FileManager:
 		for (dirpath, dirnames, filenames) in walk(self.source_folder):
 			raw_source_files.extend(filenames)
 
-		names = []
+		files = []
 		for f in raw_source_files:
 			if self.apply_filter(self.source_folder + f):
-				names.append(f[:-len(self.source_extension)])
+				files.append(self.create_article_file(f[:-len(self.source_extension)]))
 
-		return names
+		return files
 
 	def list_changed_source(self):
 		return self.state_monitor.get_changed_files(self.list_source())
 
 	def exists(self, name):
-		return path.exists(self.get_full_path(name))
+		return path.exists(os.path.join(self.source_folder, name + self.source_extension))
 
-	def get_full_path(self, name):
-		return os.path.join(self.source_folder, name + self.source_extension)
-
-	def get_source_content(self, name):
-		if not path.exists(self.get_full_path(name)):
+	def get_source_content(self, file):
+		if not path.exists(file.source):
 			return ['']
-		with open(self.get_full_path(name), "r") as file:
+		with open(file.source, "r") as file:
 			return file.readlines()
 
-	def set_source_content(self, name, content):
-		with open(self.get_full_path(name), "w") as file:
+	def set_source_content(self, file, content):
+		with open(file.source, "w") as file:
 			file.write(content)
 
-	def save_output(self, name, content):
-		with open(self.render_folder + name + self.render_extension, "w") as file:
-			file.write(content)
-		self.state_monitor.update(name, self.get_full_path(name))
+	def save_output(self, file, content):
+		with open(file.output, "w") as f:
+			f.write(content)
+		self.state_monitor.update(file)
 	
-	def delete_article(self, name):
-		dest_file = path.join(self.render_folder, name + self.render_extension)
-		if os.path.isfile(dest_file):
-			os.remove(dest_file)
-		self.state_monitor.remove(name)
+	def delete_article(self, file):
+		if os.path.isfile(file.output):
+			os.remove(file.output)
+		self.state_monitor.remove(file)
 
 
 
@@ -171,13 +167,13 @@ class FileLinker:
 	def create_new_files(self):
 		display("Scanning for new children...")
 		new_articles = []
-		for title in self.filemgr.list_source():
-			article = self.article_reader.read_article(title)
+		for file in self.filemgr.list_source():
+			article = self.article_reader.read_article(file.name)
 			for child_title in article.children:
 				if child_title == "":
 					continue
 				if not self.filemgr.exists(child_title):
-					self.create_empty_source_file(child_title, [title])
+					self.create_empty_source_file(child_title, [file.name])
 					new_articles.append(child_title)
 					display('- Created new children: ' + child_title)
 			if len(article.parents) == 0:
@@ -204,28 +200,28 @@ class FileLinker:
 	# Updates missing parents
 	def update_parents(self):
 		display("Updating missing parents...")
-		for title in self.filemgr.list_source():
-			article = self.article_reader.read_article(title)
+		for file in self.filemgr.list_source():
+			article = self.article_reader.read_article(file.name)
 			for child_title in article.children:
 				if child_title == '':
 					continue
 				child = self.article_reader.read_article(child_title)
-				if not title in child.parents:
-					child.parents.append(title)
+				if not file.name in child.parents:
+					child.parents.append(file.name)
 					self.article_reader.save_article(child)
-					display('- Updated ' + child.title + ' with missing parent: ' + title)
+					display('- Updated ' + child.title + ' with missing parent: ' + file.name)
 
 	# Updates missing children
 	def update_children(self):
 		display("Updating missing children...")
-		for title in self.filemgr.list_source():
-			article = self.article_reader.read_article(title)
+		for file in self.filemgr.list_source():
+			article = self.article_reader.read_article(file.name)
 			for parent_title in article.parents:
 				if parent_title == '':
 					continue
 
 				parent = self.article_reader.read_article(parent_title)
-				if not title in parent.children:
-					parent.children.append(title)
+				if not file.name in parent.children:
+					parent.children.append(file.name)
 					self.article_reader.save_article(parent)
-					display('- Updated ' + parent.title + ' with missing children: ' + title)
+					display('- Updated ' + parent.title + ' with missing children: ' + file.name)

@@ -1,7 +1,7 @@
-import model
+from article import ArticleFile
 import markdown
 from jinja2 import Environment, FileSystemLoader
-import json
+import os
 
 class HtmlGenerator:
 	def __init__(self, filemgr):
@@ -25,7 +25,8 @@ class HtmlGenerator:
 
 		page_template = self.get_template(self.filemgr.template_name)
 		content_html = page_template.render(post=data)
-		self.filemgr.save_output(article.title, content_html)
+		file = self.filemgr.create_article_file(article.title)
+		self.filemgr.save_output(file, content_html)
 		print("- Generated " + article.title)
 
 	def generate_map(self, graph_svg):
@@ -36,12 +37,12 @@ class HtmlGenerator:
 
 		page_template = self.get_template(self.filemgr.template_map)
 		content_html = page_template.render(post=data)
-		self.filemgr.save_output('map', content_html)
+		self.filemgr.save_output(self.filemgr.create_template_file('map', self.filemgr.template_map), content_html)
 
 	def generate_news(self, ordered_articles):
 		data = ordered_articles
 
 		page_template = self.get_template(self.filemgr.template_news)
 		content_html = page_template.render(articles=data)
-		self.filemgr.save_output('news', content_html)
+		self.filemgr.save_output(self.filemgr.create_template_file('news', self.filemgr.template_news), content_html)
 

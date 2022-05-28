@@ -2,6 +2,7 @@ import pytest
 import filechanges
 import os
 from unittest.mock import MagicMock
+from article import ArticleFile
 
 # Persistence of file states into memory
 class FileStateDatabasePersistenceMemory(filechanges.FileStateDatabasePersistence):
@@ -19,7 +20,7 @@ class TestDatabasePersistenceFile:
 	def test_WithOneState_WhenSavingThenLoading_ThenGivesCorrectStates(self):
 		persistence = filechanges.FileStateDatabasePersistence("test.json")
 		states = {}
-		states['Test.md'] = filechanges.FileState("Test.md", "Test.html", "ASBD", "SLKD")
+		states['Test.md'] = filechanges.FileState('Test', "Test.md", "Test.html", "ASBD", "SLKD")
 		persistence.save(states)
 		states2 = persistence.load()
 		assert 'Test.md' in states2
@@ -45,7 +46,7 @@ class TestFileStateDatabase:
 	def test_WhenUpdatingDatabase_ThenPersistenceIsUpdated(self):
 		p = FileStateDatabasePersistenceMemory()
 		db = filechanges.FileStateDatabase(p)
-		db.update('Test', filechanges.FileState("Test.md", "Test.html", "ABCD", "EFGH"))
+		db.update('Test', filechanges.FileState('Test', "Test.md", "Test.html", "ABCD", "EFGH"))
 		assert "Test" in p.states
 
 	def test_WithEmptyDatabase_WhenGetting_ThenThrowsException(self):
@@ -59,19 +60,19 @@ class TestFileStateDatabase:
 
 	def test_WithExistingEntryInDb_WhenRemovingItem_ThenDatabaseRemovesEntry(self):
 		p = FileStateDatabasePersistenceMemory()
-		p.states['SomeFile.md'] = filechanges.FileStateGetter().get("SomeFile.md", "SomeOutput.html")
+		p.states['SomeFile.md'] = filechanges.FileStateGetter().get('SomeFile', "SomeFile.md", "SomeOutput.html")
 		db = filechanges.FileStateDatabase(p)
 		db.remove("SomeFile.md")
 		assert 'SomeFile.md' not in p.states
 
 	def test_WithTwoExistingEntries_WhenGettingDeleted_ThenSecondEntryIsReturned(self):
 		p = FileStateDatabasePersistenceMemory()
-		p.states['file1.md'] = filechanges.FileState('file1.md', '', '', '')
-		p.states['file2.md'] = filechanges.FileState('file2.md', '', '', '')
+		p.states['file1.md'] = filechanges.FileState('file1', 'file1.md', '', '', '')
+		p.states['file2.md'] = filechanges.FileState('file2', 'file2.md', '', '', '')
 		db = filechanges.FileStateDatabase(p)
-		result = db.get_deleted(['file1.md'])
+		result = db.get_deleted_states(['file1.md'])
 		assert len(result) == 1
-		assert result[0] == 'file2.md'
+		assert result[0].source == 'file2.md'
 		assert db.exists('file1.md') == True
 		assert db.exists('file2.md') == True
 
@@ -79,7 +80,7 @@ class TestFileStateDatabase:
 		p = FileStateDatabasePersistenceMemory()
 		p.save = MagicMock()
 		db = filechanges.FileStateDatabase(p)
-		db.states['test'] = filechanges.FileState('test.md', '', '', '')
+		db.states['test'] = filechanges.FileState('test', 'test.md', '', '', '')
 		db.remove('test')
 		p.save.assert_called_with(db.states)
 		assert db.exists('test') == False
@@ -102,97 +103,89 @@ class TestFileStateMonitor:
 		def remove(self, name):
 			del self.states[name]
 
+	def make_filestate(self, name):
+		return filechanges.FileState(name, name + '.md', name + '.html', '', '')
+
 	def test_WithEmptyDatabase_WhenHasChanged_ThenReturnsTrue(self):
 		db = TestFileStateMonitor.FileStateDatabaseMock()
 		mon = filechanges.FileStateMonitor(db, "dest")
-		assert mon.has_changed("Unexisting") == True
+		assert mon.has_changed(ArticleFile('Unchanged', '', '')) == True
 
 	def test_WithExistingFile_WhenHasNotChanged_ThenReturnsFalse(self):
-		state = filechanges.FileState('file.md', 'file.html', 'abcd', 'abcd')
+		state = self.make_filestate('file')
 		db = TestFileStateMonitor.FileStateDatabaseMock()
 		db.exists = MagicMock(return_value=True)
 		db.get = MagicMock(return_value=state)
 		mon = filechanges.FileStateMonitor(db, "dest")
 		mon.state_getter.get = MagicMock(return_value=state)
-		assert mon.has_changed('file.md') == False
+		assert mon.has_changed(ArticleFile('file', 'file.md', 'file.html')) == False
 
 	def test_WithExistingFile_WhenHasChanged_ThenReturnsTrue(self):
-		prev_state = filechanges.FileState('file.md', 'file.html', 'abcd', 'abcd')
-		current_state = filechanges.FileState('file.md', 'file.html', 'abcde', 'abcdf')
+		prev_state = self.make_filestate('file')
+		current_state = filechanges.FileState('file', 'file.md', 'file.html', 'abcde', 'abcdf')
 		db = TestFileStateMonitor.FileStateDatabaseMock()
 		db.exists = MagicMock(return_value=True)
 		db.get = MagicMock(return_value=prev_state)
 		mon = filechanges.FileStateMonitor(db, "dest")
 		mon.state_getter.get = MagicMock(return_value=current_state)
-		assert mon.has_changed('file.md') == True
+		assert mon.has_changed(ArticleFile('file', 'file.md', 'file.html')) == True
 
 	def test_WithExistingFile_WhenSourceHasChanged_ThenReturnsTrue(self):
-		prev_state = filechanges.FileState('file.md', 'file.html', 'abcd', 'abcd')
-		current_state = filechanges.FileState('file.md', 'file.html', 'abcde', 'abcd')
+		prev_state = self.make_filestate('file')
+		current_state = filechanges.FileState('file', 'file.md', 'file.html', 'abcde', '')
 		db = TestFileStateMonitor.FileStateDatabaseMock()
 		db.exists = MagicMock(return_value=True)
 		db.get = MagicMock(return_value=prev_state)
 		mon = filechanges.FileStateMonitor(db, "dest")
 		mon.state_getter.get = MagicMock(return_value=current_state)
-		assert mon.has_changed('file.md') == True
+		assert mon.has_changed(ArticleFile('file', '', '')) == True
 
 	def test_WithExistingFile_WhenDestinationHasChanged_ThenReturnsTrue(self):
-		prev_state = filechanges.FileState('file.md', 'file.html', 'abcd', 'abcd')
-		current_state = filechanges.FileState('file.md', 'file.html', 'abcd', 'abcdf')
+		prev_state = self.make_filestate('file')
+		current_state = filechanges.FileState('file', 'file.md', 'file.html', '', 'abcdf')
 		db = TestFileStateMonitor.FileStateDatabaseMock()
 		db.exists = MagicMock(return_value=True)
 		db.get = MagicMock(return_value=prev_state)
 		mon = filechanges.FileStateMonitor(db, "dest")
 		mon.state_getter.get = MagicMock(return_value=current_state)
-		assert mon.has_changed('file.md') == True
+		assert mon.has_changed(ArticleFile('file', 'file.md', 'file.html')) == True
 
 	def test_WithEmptyDatabase_WhenUpdate_ThenUpdatesDatabase(self):
 		db = TestFileStateMonitor.FileStateDatabaseMock()
 		mon = filechanges.FileStateMonitor(db, "dest")
-		mon.update('unexisting-file', "unexisting-file.md")
-		assert db.exists("unexisting-file") == True
+		mon.update(ArticleFile('file', 'file.md', 'file.html'))
+		assert db.exists('file') == True
 
 	def test_WithFileInDatabase_WithInexistantFile_WhenUpdate_ThenFileGetsRemovedFromDatabase(self):
 		db = TestFileStateMonitor.FileStateDatabaseMock()
 		db.exists = MagicMock(return_value=True)
 		db.remove = MagicMock()
 		mon = filechanges.FileStateMonitor(db, 'dest')
-		mon.update('some-inexistant-file', 'some-inexistant-file.md')
-		db.remove.assert_called_with('some-inexistant-file')
-
-	def test_WithFileSystemFile_WhenGettingDestination_ThenReturnsValidDestination(self):
-		mon = filechanges.FileStateMonitor(TestFileStateMonitor.FileStateDatabaseMock(), '.')
-		with open('test-file.md', 'w') as f:
-			f.write('.')
-		with open('test-file.html', 'w') as f2:
-			f2.write('.')
-		dest = mon.get_destination('./test-file.md')
-		os.path.isfile(dest)
-		os.remove('./test-file.md')
-		os.remove('./test-file.html')
+		mon.update(ArticleFile('file', 'file.md', 'file.html'))
+		db.remove.assert_called_with('file')
 
 	def test_WithTwoFiles_WithOneDeleted_WhenGettingChangedFiles_ThenDeletedFileIsReturned(self):
 		db = TestFileStateMonitor.FileStateDatabaseMock()
-		db.states['file1.md'] = filechanges.FileState('file1.md', '', '', '')
-		db.states['file2.md'] = filechanges.FileState('file2.md', '', '', '')
+		db.states['file1'] = self.make_filestate('file1')
+		db.states['file2'] = self.make_filestate('file2')
 		mon = filechanges.FileStateMonitor(db, '')
-		changed = mon.get_changed_files(['file1.md'])
+		changed = mon.get_changed_files([ArticleFile('file1', 'file1.md', '')])
 		assert len(changed) == 1
-		assert changed[0] == 'file2.md'
+		assert changed[0].source == 'file2.md'
 
 	def mock_has_changed(self, file):
-		return file == 'file3.md'
+		return file.name == 'file3'
 
 	def test_WithThreeFiles_WithOneDeleted_WithOneChanged_WhenGettingChangedFiles_ThenDeletedFileAndChangedFileIsReturned(self):
 		db = TestFileStateMonitor.FileStateDatabaseMock()
-		db.states['file1.md'] = filechanges.FileState('file1.md', '', 'abc', '')
-		db.states['file2.md'] = filechanges.FileState('file2.md', '', 'abc', '')
-		db.states['file2.md'] = filechanges.FileState('file3.md', '', 'abc', '')
+		db.states['file1'] = self.make_filestate('file1')
+		db.states['file2'] = self.make_filestate('file2')
+		db.states['file3'] = self.make_filestate('file3')
 		mon = filechanges.FileStateMonitor(db, '')
 		mon.has_changed = MagicMock(side_effect=self.mock_has_changed)
-		changed = mon.get_changed_files(['file1.md', 'file3.md'])
+		changed = mon.get_changed_files([ArticleFile('file1', 'file1.md', ''), ArticleFile('file3', 'file3.md', '')])
 		assert len(changed) == 2
-		assert changed[0] == 'file2.md'
-		assert changed[1] == 'file3.md'
+		assert changed[0].name == 'file2'
+		assert changed[1].name == 'file3'
 
 		

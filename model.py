@@ -2,6 +2,7 @@ import json as jsonlib
 import os
 from os import path
 from os import system
+from os import walk
 import filechanges
 import datetime
 import hashlib
@@ -91,10 +92,10 @@ class FileManager:
 		if not path.isdir(".build"):
 			os.mkdir(".build")
 		db_hash = hashlib.md5(outputFolder.encode('utf-8')).hexdigest()
-		change_db = filechanges.File(".build/" + str(db_hash))
-		self.change_register = filechanges.FileChangeRegister(change_db)
+		db_persistence = filechanges.FileStateDatabasePersistence(".build/" + str(db_hash))
+		db = filechanges.FileStateDatabase(db_persistence)
+		self.change_register = filechanges.FileStateMonitor(db, outputFolder)
 		self.file_filters = [".DS_Store"]
-
 
 	def apply_filter(self, source_file):
 		for filt in self.file_filters:

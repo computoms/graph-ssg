@@ -1,98 +1,91 @@
+import pytest
 import filechanges
 import os
 
-# Mock of IO to disk
-class MemoryFile(filechanges.File):
-	def __init__(self, lines) -> None:
+# Persistence of file states into memory
+class FileStateDatabasePersistenceMemory(filechanges.FileStateDatabasePersistence):
+	def __init__(self) -> None:
 		super().__init__("")
-		self.lines = lines
+		self.states = {}
 
-	def get_lines(self):
-		return self.lines
+	def save(self, states):
+		self.states = states
 
-	def write_content(self, content):
-		self.lines = content.split('\n')
+	def load(self):
+		return self.states
 
-	def assert_file(self):
-		pass
+class TestDatabasePersistenceFile:
+	def test_WithOneState_WhenSavingThenLoading_ThenGivesCorrectStates(self):
+		persistence = filechanges.FileStateDatabasePersistence("test.json")
+		states = {}
+		states['Test.md'] = filechanges.FileState("Test.md", "Test.html", "ASBD", "SLKD")
+		persistence.save(states)
+		states2 = persistence.load()
+		assert 'Test.md' in states2
+		assert states2['Test.md'].source == 'Test.md'
+		assert states2['Test.md'].destination == 'Test.html'
+		assert states2['Test.md'].source_hash == 'ASBD'
+		assert states2['Test.md'].destination_hash == 'SLKD'
+		os.remove("test.json")
 
-def init():
-	if not os.path.isdir("test"):
-		os.mkdir("test")
+	def test_WithUnexistingDatabaseFile_WhenLoading_ReturnsEmptyDatabase(self):
+		p = filechanges.FileStateDatabasePersistence("test.json")
+		db = p.load()
+		assert len(db) == 0
 
-def test_WithEmptyFile_WhenReadingRegisters_ThenReturnsEmptyCollection():
-	init()
-	empty_db = MemoryFile([])
-	r = filechanges.FileChangeRegister(empty_db)
+class TestFileState:
+	def test_WithEmptyFile_WhenComputingHash_ReturnsEmpty(self):
+		assert filechanges.FileState.compute_hash("NotExisting.test") == ""
 
-	registers = r.read_registers()
-	assert len(registers) == 0
+class TestFileStateDatabase:
+	def test_WhenUpdatingDatabase_ThenPersistenceIsUpdated(self):
+		p = FileStateDatabasePersistenceMemory()
+		db = filechanges.FileStateDatabase(p)
+		db.update(filechanges.FileState("Test.md", "Test.html", "ABCD", "EFGH"))
+		assert "Test.md" in p.states
 
-def test_WithSingleEntry_WhenReadingRegisters_ThenReturnsCorrectEntry():
-	init()
-	single_db = MemoryFile(["TestFile.txt,ABCDE\n"])
-	r2 = filechanges.FileChangeRegister(single_db)
-	regs = r2.read_registers()
-	assert(len(regs) == 1)
-	assert(regs['TestFile.txt'].rstrip() == 'ABCDE')
-
-
-def test_WithSingleEngty_WhenWritingRegisters_ThenWritesCorrectFile():
-	init()
-	registers = {}
-	registers['TestFile.txt'] = 'ABCDE'
-	db = MemoryFile([])
-	r = filechanges.FileChangeRegister(db)
-	r.write_registers(registers)
-	assert(len(db.get_lines()) == 2)
-	assert(db.get_lines()[0] == "TestFile.txt,ABCDE")
-
-def test_WithUnchangedFile_WhenHasChanged_ThenReturnsFalse():
-	init()
-	db = MemoryFile([])
-	r = filechanges.FileChangeRegister(db)
-	with open("test/TestFile.txt", "w") as file:
-		file.write("Hello")
-	db.write_content("test/TestFile.txt," + r.compute_hash("test/TestFile.txt") + "\n")
+	def test_WithEmptyDatabase_WhenGetting_ThenThrowsException(self):
+		p = FileStateDatabasePersistenceMemory()
+		db = filechanges.FileStateDatabase(p)
+		with pytest.raises(Exception) as e_info:
+			assert db.get("none.md") == None
 	
-	assert(r.has_changed("test/TestFile.txt") == False)
-	os.remove("test/TestFile.txt")
+	def test_WithEmptyDatabase_WhenTestingIfItemExists_ThenReturnsFalse(self):
+		p = FileStateDatabasePersistenceMemory()
+		db = filechanges.FileStateDatabase(p)
+		assert db.exists("no.md") == False
 
-def test_WithChangedFile_WhenHasChanged_ThenReturnsTrue():
-	init()
-	db = MemoryFile([])
-	r = filechanges.FileChangeRegister(db)
-	with open("test/TestFile.txt", "w") as file:
-		file.write("Hello")
-	db.write_content("test/TestFile.txt," + r.compute_hash("test/TestFile.txt") + "\n")
-	with open("test/TestFile.txt", "w") as file:
-		file.write("Hello2")
-	
-	assert(r.has_changed("test/TestFile.txt") == True)
-	os.remove("test/TestFile.txt")
+class TestFileStateMonitor:
+	def test_WithEmptyDatabase_WhenHasChanged_ThenReturnsTrue(self):
+		p = FileStateDatabasePersistenceMemory()
+		db = filechanges.FileStateDatabase(p)
+		mon = filechanges.FileStateMonitor(db, "dest")
+		assert mon.has_changed("Unexisting") == True
 
-def test_WithFileNotInRegister_WhenHasChanged_ThenAddsToRegister():
-	init()
-	db = MemoryFile([])
-	r = filechanges.FileChangeRegister(db)
-	with open("test/TestFile.txt", "w") as file:
-		file.write("Hello")
-	assert(r.has_changed("test/TestFile.txt") == True)
-	assert(len(r.read_registers()) == 1)
-	assert(r.read_registers()["test/TestFile.txt"] == r.compute_hash("test/TestFile.txt"))
-	os.remove("test/TestFile.txt")
+	def test_WithExistingFile_WhenHasNotChanged_ThenReturnsFalse(self):
+		p = FileStateDatabasePersistenceMemory()
+		db = filechanges.FileStateDatabase(p)
+		db.update(filechanges.FileState("unexisting-file.md", "unexisting-file.html", "", ""))
+		mon = filechanges.FileStateMonitor(db, "dest")
+		assert mon.has_changed("unexisting-file.md") == False
 
-def test_WithFileInRegister_WhenUpdate_ThenUpdatesRegister():
-	init()
-	db = MemoryFile([])
-	r = filechanges.FileChangeRegister(db)
-	with open("test/TestFile.txt", "w") as file:
-		file.write("Hello")
-	db.write_content("test/TestFile.txt," + r.compute_hash("test/TestFile.txt") + "\n")
-	assert(r.has_changed("test/TestFile.txt") == False)
-	with open("test/TestFile.txt", "w") as file:
-		file.write("Hello 2")
-	assert(r.has_changed("test/TestFile.txt") == True)
-	r.update("test/TestFile.txt")
-	assert(r.has_changed("test/TestFile.txt") == False)
-	os.remove("test/TestFile.txt")
+	def test_WithExistingFile_WhenSourceHasChanged_ThenReturnsTrue(self):
+		p = FileStateDatabasePersistenceMemory()
+		db = filechanges.FileStateDatabase(p)
+		db.update(filechanges.FileState("unexisting-file.md", "unexisting-file.html", "ABCD", ""))
+		mon = filechanges.FileStateMonitor(db, "dest")
+		assert mon.has_changed("unexisting-file.md") == True
+
+	def test_WithExistingFile_WhenDestinationHasChanged_ThenReturnsTrue(self):
+		p = FileStateDatabasePersistenceMemory()
+		db = filechanges.FileStateDatabase(p)
+		db.update(filechanges.FileState("unexisting-file.md", "unexisting-file.html", "", "ABCD"))
+		mon = filechanges.FileStateMonitor(db, "dest")
+		assert mon.has_changed("unexisting-file.md") == True
+
+	def test_WithEmptyDatabase_WhenUpdate_ThenUpdatesDatabase(self):
+		p = FileStateDatabasePersistenceMemory()
+		db = filechanges.FileStateDatabase(p)
+		mon = filechanges.FileStateMonitor(db, "dest")
+		mon.update("unexisting-file.md")
+		assert db.exists("unexisting-file.md") == True

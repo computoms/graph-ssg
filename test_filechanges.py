@@ -20,14 +20,16 @@ def init():
 	if not os.path.isdir("test"):
 		os.mkdir("test")
 
-def readregisters_whenemptyfile_returnsemptycollection():
+def test_WithEmptyFile_WhenReadingRegisters_ThenReturnsEmptyCollection():
+	init()
 	empty_db = MemoryFile([])
 	r = filechanges.FileChangeRegister(empty_db)
 
 	registers = r.read_registers()
-	assert(len(registers) == 0)
+	assert len(registers) == 0
 
-def readregisters_whensingleentry_returnscorrectentry():
+def test_WithSingleEntry_WhenReadingRegisters_ThenReturnsCorrectEntry():
+	init()
 	single_db = MemoryFile(["TestFile.txt,ABCDE\n"])
 	r2 = filechanges.FileChangeRegister(single_db)
 	regs = r2.read_registers()
@@ -35,7 +37,8 @@ def readregisters_whensingleentry_returnscorrectentry():
 	assert(regs['TestFile.txt'].rstrip() == 'ABCDE')
 
 
-def writeregisters_whensingleentry_writescorrectfile():
+def test_WithSingleEngty_WhenWritingRegisters_ThenWritesCorrectFile():
+	init()
 	registers = {}
 	registers['TestFile.txt'] = 'ABCDE'
 	db = MemoryFile([])
@@ -44,7 +47,8 @@ def writeregisters_whensingleentry_writescorrectfile():
 	assert(len(db.get_lines()) == 2)
 	assert(db.get_lines()[0] == "TestFile.txt,ABCDE")
 
-def haschanged_whenfilenotchanged_returnsfalse():
+def test_WithUnchangedFile_WhenHasChanged_ThenReturnsFalse():
+	init()
 	db = MemoryFile([])
 	r = filechanges.FileChangeRegister(db)
 	with open("test/TestFile.txt", "w") as file:
@@ -54,7 +58,8 @@ def haschanged_whenfilenotchanged_returnsfalse():
 	assert(r.has_changed("test/TestFile.txt") == False)
 	os.remove("test/TestFile.txt")
 
-def haschanged_whenfilechanged_returnstrue():
+def test_WithChangedFile_WhenHasChanged_ThenReturnsTrue():
+	init()
 	db = MemoryFile([])
 	r = filechanges.FileChangeRegister(db)
 	with open("test/TestFile.txt", "w") as file:
@@ -66,7 +71,8 @@ def haschanged_whenfilechanged_returnstrue():
 	assert(r.has_changed("test/TestFile.txt") == True)
 	os.remove("test/TestFile.txt")
 
-def haschanged_whenfilenotinregister_addstoregister():
+def test_WithFileNotInRegister_WhenHasChanged_ThenAddsToRegister():
+	init()
 	db = MemoryFile([])
 	r = filechanges.FileChangeRegister(db)
 	with open("test/TestFile.txt", "w") as file:
@@ -76,7 +82,8 @@ def haschanged_whenfilenotinregister_addstoregister():
 	assert(r.read_registers()["test/TestFile.txt"] == r.compute_hash("test/TestFile.txt"))
 	os.remove("test/TestFile.txt")
 
-def update_whenfileinregister_updatesregister():
+def test_WithFileInRegister_WhenUpdate_ThenUpdatesRegister():
+	init()
 	db = MemoryFile([])
 	r = filechanges.FileChangeRegister(db)
 	with open("test/TestFile.txt", "w") as file:
@@ -89,12 +96,3 @@ def update_whenfileinregister_updatesregister():
 	r.update("test/TestFile.txt")
 	assert(r.has_changed("test/TestFile.txt") == False)
 	os.remove("test/TestFile.txt")
-
-init()
-readregisters_whenemptyfile_returnsemptycollection()
-readregisters_whensingleentry_returnscorrectentry()
-writeregisters_whensingleentry_writescorrectfile()
-haschanged_whenfilenotchanged_returnsfalse()
-haschanged_whenfilechanged_returnstrue()
-haschanged_whenfilenotinregister_addstoregister()
-update_whenfileinregister_updatesregister()

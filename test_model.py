@@ -1,6 +1,6 @@
 import model
 
-class TestingFileManager:
+class FileManagerMock:
 	def __init__(self):
 		self.source = ""
 		self.output = ""
@@ -32,45 +32,7 @@ class TestingFileManager:
 	def save_output(self, name, content):
 		self.output = content
 
-class ArticleReaderTest:
-
-	def readarticle_validarticle_returnsvalidtitle(self):
-		f = TestingFileManager()
-		a = model.ArticleReader(f)
-		article = a.read_article('Source01')
-		assert(article.title == "Test")
-
-	def readarticle_validarticle_returnsvalidparents(self):
-		f = TestingFileManager()
-		a = model.ArticleReader(f)
-		article = a.read_article('Source01')
-		assert(len(article.parents) == 1)
-		assert(article.parents[0] == "Parent01")
-
-
-	def readarticle_validarticle_returnsvalidchildren(self):
-		f = TestingFileManager()
-		a = model.ArticleReader(f)
-		article = a.read_article('Source01')
-		assert(len(article.children) == 2)
-		assert(article.children[0] == "Children01")
-		assert(article.children[1] == "Children02")
-
-	def readarticle_validarticle_returnsvalidcontent(self):
-		f = TestingFileManager()
-		a = model.ArticleReader(f)
-		article = a.read_article('Source01')
-		assert(article.content == " Content")
-
-	def savearticle_savescorrectlyformattedarticle(self):
-		f = TestingFileManager()
-		a = model.ArticleReader(f)
-		article = model.Article("TestArticle", ["Parent01"], ["Children01", "Children02"], "2020-01-01", "", "This is the article content.")
-		a.save_article(article)
-		assert(f.source == '{\n"Title": "TestArticle",\n"Abstract": "", \n"Parents": ["Parent01"], \n"Children": ["Children01","Children02"], \n"Date": "2020-01-01" \n}\nThis is the article content.')
-
-
-class TestingFileManagerForLinks:
+class FileManagerMockForLinks:
 	def __init__(self):
 		self.articles = []
 		self.source = {}
@@ -86,7 +48,7 @@ class TestingFileManagerForLinks:
 		return [article.title for article in self.articles]
 
 	def list_changed_source(self):
-		return list_source(self)
+		return self.list_source(self)
 
 	def exists(self, name):
 		return name in self.list_source()
@@ -111,55 +73,77 @@ class TestingFileManagerForLinks:
 	def save_output(self, name, content):
 		self.output = content
 
-class FileLinkerTest:
-	def updatechildren_parentwithnochildren_updatesparentwithonechildren(self):
-		f = TestingFileManagerForLinks()
+class TestArticleReader:
+
+	def test_WithValidArtcile_WhenReadingArticle_ThenReturnsValidTitle(self):
+		f = FileManagerMock()
+		a = model.ArticleReader(f)
+		article = a.read_article('Source01')
+		assert article.title == "Test"
+
+	def test_WithValidArtcile_WhenReadingArticle_ThenReturnsValidParents(self):
+		f = FileManagerMock()
+		a = model.ArticleReader(f)
+		article = a.read_article('Source01')
+		assert len(article.parents) == 1 
+		assert article.parents[0] == "Parent01" 
+
+	def test_WithValidArtcile_WhenReadingArticle_ThenReturnsValidChildren(self):
+		f = FileManagerMock()
+		a = model.ArticleReader(f)
+		article = a.read_article('Source01')
+		assert len(article.children) == 2
+		assert article.children[0] == "Children01"
+		assert article.children[1] == "Children02"
+
+	def test_WithValidArtcile_WhenReadingArticle_ThenReturnsValidContent(self):
+		f = FileManagerMock()
+		a = model.ArticleReader(f)
+		article = a.read_article('Source01')
+		assert article.content == " Content"
+
+	def test_WithValidArticle_WhenSavingArticle_ThenSavesCorrectlyFormattedArticle(self):
+		f = FileManagerMock()
+		a = model.ArticleReader(f)
+		article = model.Article("TestArticle", ["Parent01"], ["Children01", "Children02"], "2020-01-01", "", "This is the article content.")
+		a.save_article(article)
+		assert f.source == '{\n"Title": "TestArticle",\n"Abstract": "", \n"Parents": ["Parent01"], \n"Children": ["Children01","Children02"], \n"Date": "2020-01-01" \n}\nThis is the article content.'
+
+class TestFileLinker:
+	def test_WithParentWithNoChildren_WhenUpdatingChildren_ThenUpdatesParentWithOneChild(self):
+		f = FileManagerMockForLinks()
 		f.articles.append(model.Article("Parent01", [], [], "2020-01-01", "", ""))
 		f.articles.append(model.Article("Children01", ["Parent01"], [], "2020-01-01", "", ""))
 		reader = model.ArticleReader(f)
 		linker = model.FileLinker(f, reader)
 		linker.update_children()
-		assert("Children01" in f.source['Parent01'])
+		assert "Children01" in f.source['Parent01']
 
-	def updateparent_childrenwithnoparent_updateschildrenwithoneparent(self):
-		f = TestingFileManagerForLinks()
+	def test_WithChildrenWithoutParent_WhenUpdatingParent_ThenUpdatesChildrenWithOneParent(self):
+		f = FileManagerMockForLinks()
 		f.articles.append(model.Article("Parent01", [], ["Children01"], "", "", ""))
 		f.articles.append(model.Article("Children01", [], [], "", "", ""))
 		reader = model.ArticleReader(f)
 		linker = model.FileLinker(f, reader)
 		linker.update_parents()
-		assert("Parent01" in f.source['Children01'])
+		assert "Parent01" in f.source['Children01']
 
-	def createnewfiles_parentwithinexistantchildren_createsnewchildren(self):
-		f = TestingFileManagerForLinks()
+	def test_WithParentWithExistingChildren_WhenCreatingNewFile_ThenCreatesNewChildren(self):
+		f = FileManagerMockForLinks()
 		f.articles.append(model.Article("Parent01", [], ["Children01"], "", "", ""))
 		reader = model.ArticleReader(f)
 		linker = model.FileLinker(f, reader)
 		linker.open_editor_on_create = False
 		linker.create_new_files()
-		assert(len(f.source) == 1)
-		assert(f.source['Children01'] != "")
+		assert len(f.source) == 1
+		assert f.source['Children01'] != ""
 
-	def createnewfiles_childwithinexistingparent_createsnewparent(self):
-		f = TestingFileManagerForLinks()
+	def test_WithChildWithExistingParent_WhenCreatingNewFiles_ThenCreatesNewParent(self):
+		f = FileManagerMockForLinks()
 		f.articles.append(model.Article("Children01", ["Parent01"], [], "", "", ""))
 		reader = model.ArticleReader(f)
 		linker = model.FileLinker(f, reader)
 		linker.open_editor_on_create = False
 		linker.create_new_files()
-		assert(len(f.source) == 1)
-		assert(f.source['Parent01'] != "")
-
-
-article_reader_test = ArticleReaderTest()
-article_reader_test.readarticle_validarticle_returnsvalidtitle()
-article_reader_test.readarticle_validarticle_returnsvalidparents()
-article_reader_test.readarticle_validarticle_returnsvalidchildren()
-article_reader_test.readarticle_validarticle_returnsvalidcontent()
-article_reader_test.savearticle_savescorrectlyformattedarticle()
-
-file_linker_test = FileLinkerTest()
-file_linker_test.updatechildren_parentwithnochildren_updatesparentwithonechildren()
-file_linker_test.updateparent_childrenwithnoparent_updateschildrenwithoneparent()
-file_linker_test.createnewfiles_parentwithinexistantchildren_createsnewchildren()
-file_linker_test.createnewfiles_childwithinexistingparent_createsnewparent()
+		assert len(f.source) == 1
+		assert f.source['Parent01'] != ""

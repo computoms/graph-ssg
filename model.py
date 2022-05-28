@@ -35,7 +35,7 @@ class ArticleReader:
 
 		source_lines = self.filemgr.get_source_content(name)
 		if len(source_lines) == 0:
-			return Article("None", [], [], "", "")
+			return Article("None", [], [], "", "", "")
 
 		is_font_matter = False
 		open_count = 0

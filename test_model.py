@@ -73,6 +73,11 @@ class FileManagerMockForLinks:
 	def save_output(self, name, content):
 		self.output = content
 
+class TestArticle:
+	def test_WhenGettingPublicationDatePretty_ThenReturnsPrettyDate(self):
+		a = model.Article('', '', '', '2020-05-01', '', '')
+		assert a.get_publication_date_pretty() == "May 01, 2020"
+
 class TestArticleReader:
 
 	def test_WithValidArtcile_WhenReadingArticle_ThenReturnsValidTitle(self):

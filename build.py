@@ -67,10 +67,12 @@ def main(argv):
 		linker.create_new_files()
 		linker.update_missing_links()
 
-	def generate_sources():
-		article_names = filemgr.list_changed_source()
-		print(str(len(article_names)) + " articles changed.")
-		for name in article_names:
+	def generate_sources(changed_sources):
+		print(str(len(changed_sources)) + " articles changed.")
+		for name in changed_sources:
+			if not filemgr.exists(name):
+				filemgr.delete_article(name)
+				continue
 			article = reader.read_article(name)
 			graph_svg = graph_generator.generate(article)
 			html_generator.generate_article(article, graph_svg)
@@ -92,12 +94,13 @@ def main(argv):
 		html_generator.generate_map(graph_generator.generate_full(filemgr.list_source()))
 		generate_news()
 
-	if len(filemgr.list_changed_source()) == 0:
+	changed_sources = filemgr.list_changed_source()
+	if not any(changed_sources):
 		print('Nothing changed.')
 		exit()
 
 	update_new_links()
-	generate_sources()
+	generate_sources(changed_sources)
 	generate_fixed_pages()
 
 

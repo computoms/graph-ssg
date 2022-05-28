@@ -94,7 +94,7 @@ class FileManager:
 		db_hash = hashlib.md5(outputFolder.encode('utf-8')).hexdigest()
 		db_persistence = filechanges.FileStateDatabasePersistence(".build/" + str(db_hash))
 		db = filechanges.FileStateDatabase(db_persistence)
-		self.change_register = filechanges.FileStateMonitor(db, outputFolder)
+		self.state_monitor = filechanges.FileStateMonitor(db, outputFolder)
 		self.file_filters = [".DS_Store"]
 
 	def apply_filter(self, source_file):
@@ -116,14 +116,13 @@ class FileManager:
 		return names
 
 	def list_changed_source(self):
-		sources = self.list_source()
-		return [f for f in sources if self.change_register.has_changed(self.get_full_path(f))]
+		return self.state_monitor.get_changed_files(self.list_source())
 
 	def exists(self, name):
 		return path.exists(self.get_full_path(name))
 
 	def get_full_path(self, name):
-		return self.source_folder + name + self.source_extension
+		return os.path.join(self.source_folder, name + self.source_extension)
 
 	def get_source_content(self, name):
 		if not path.exists(self.get_full_path(name)):
@@ -138,7 +137,14 @@ class FileManager:
 	def save_output(self, name, content):
 		with open(self.render_folder + name + self.render_extension, "w") as file:
 			file.write(content)
-		self.change_register.update(self.get_full_path(name))
+		self.state_monitor.update(name, self.get_full_path(name))
+	
+	def delete_article(self, name):
+		dest_file = path.join(self.render_folder, name + self.render_extension)
+		if os.path.isfile(dest_file):
+			os.remove(dest_file)
+		self.state_monitor.remove(name)
+
 
 
 

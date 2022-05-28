@@ -1,5 +1,7 @@
 # Graph Static Site Generator
 
+[![Python package](https://github.com/computoms/graph-ssg/actions/workflows/python-package.yml/badge.svg)](https://github.com/computoms/graph-ssg/actions/workflows/python-package.yml)
+
 `graph-ssg` is a small python program aimed at generating static html pages ordered in the form of a graph of articles.
 
 Each article generated is appended to the graph thanks to its `Parents` and `Children` articles. This provides an easy navigation as well as an easy understanding of how the articles are linked together.  

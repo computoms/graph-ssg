@@ -20,6 +20,7 @@ class Builder:
 
 	# Parse python script arguments (input, output, template or settings file)
 	def from_args(argv):
+		opts = []
 		try:
 			opts, args = getopt.getopt(argv, "hi:o:t:f:", ["input=", "output=", "templates=", "file="])
 		except getopt.GetoptError:
@@ -88,7 +89,7 @@ class Builder:
 			self.html_generator.generate_article(article, graph_svg)
 
 	def generate_fixed_pages(self):
-		shutil.copyfile(os.path.join(self.filemgr.template_location, 'index.html'), self.filemgr.render_folder + "index.html")
+		shutil.copyfile(os.path.join(self.filemgr.template_location, 'index.html'), os.path.join(self.filemgr.render_folder, "index.html"))
 		self.html_generator.generate_map(self.graph_generator.generate_full(self.filemgr.list_source()))
 		self.generate_news()
 

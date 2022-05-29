@@ -12,8 +12,10 @@ class DiskMock(Disk):
         return ['file1.md', 'file2.md']
 
 class TestFileManager:
-    fm = FileManager('input', 'output', 'templates')
-    file = ArticleFile('test', 'input/test.md', 'output/test.html')
+
+    def setup_method(self, method):
+        self.fm = FileManager('input', 'output', 'templates')
+        self.file = ArticleFile('test', 'input/test.md', 'output/test.html')
 
     def test_WhenCreateArticleFile_ThenReturnsValidArticleFile(self):
         article = self.fm.create_article_file('test')

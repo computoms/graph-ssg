@@ -47,38 +47,28 @@ class TestArticle:
 		assert a.get_publication_date_pretty() == "May 01, 2020"
 
 class TestArticleReader:
+	def setup_method(self, method):
+		self.reader = ArticleReader(FileManagerMock())
+		self.article = self.reader.read_article('Source01')
 
 	def test_WithValidArtcile_WhenReadingArticle_ThenReturnsValidTitle(self):
-		f = FileManagerMock()
-		a = ArticleReader(f)
-		article = a.read_article('Source01')
-		assert article.title == "Test"
+		assert self.article.title == "Test"
 
 	def test_WithValidArtcile_WhenReadingArticle_ThenReturnsValidParents(self):
-		f = FileManagerMock()
-		a = ArticleReader(f)
-		article = a.read_article('Source01')
-		assert len(article.parents) == 1 
-		assert article.parents[0] == "Parent01" 
+		assert len(self.article.parents) == 1 
+		assert self.article.parents[0] == "Parent01" 
 
 	def test_WithValidArtcile_WhenReadingArticle_ThenReturnsValidChildren(self):
-		f = FileManagerMock()
-		a = ArticleReader(f)
-		article = a.read_article('Source01')
-		assert len(article.children) == 2
-		assert article.children[0] == "Children01"
-		assert article.children[1] == "Children02"
+		assert len(self.article.children) == 2
+		assert self.article.children[0] == "Children01"
+		assert self.article.children[1] == "Children02"
 
 	def test_WithValidArtcile_WhenReadingArticle_ThenReturnsValidContent(self):
-		f = FileManagerMock()
-		a = ArticleReader(f)
-		article = a.read_article('Source01')
+		article = self.reader.read_article('Source01')
 		assert article.content == " Content"
 
 	def test_WithValidArticle_WhenSavingArticle_ThenSavesCorrectlyFormattedArticle(self):
-		f = FileManagerMock()
-		a = ArticleReader(f)
 		article = Article("TestArticle", ["Parent01"], ["Children01", "Children02"], "2020-01-01", "", "This is the article content.")
-		a.save_article(article)
-		assert f.source == '{\n"Title": "TestArticle",\n"Abstract": "", \n"Parents": ["Parent01"], \n"Children": ["Children01","Children02"], \n"Date": "2020-01-01" \n}\nThis is the article content.'
+		self.reader.save_article(article)
+		assert self.reader.filemgr.source == '{\n"Title": "TestArticle",\n"Abstract": "", \n"Parents": ["Parent01"], \n"Children": ["Children01","Children02"], \n"Date": "2020-01-01" \n}\nThis is the article content.'
 

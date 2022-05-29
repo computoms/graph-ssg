@@ -2,7 +2,7 @@
 
 [![Python package](https://github.com/computoms/graph-ssg/actions/workflows/python-package.yml/badge.svg)](https://github.com/computoms/graph-ssg/actions/workflows/python-package.yml) ![Tests Coverage](https://raw.githubusercontent.com/computoms/graph-ssg/master/.github/coverage.svg)
 
-`graph-ssg` is a small python program aimed at generating static html pages ordered in the form of a graph of articles.
+`graphsitegen` is a small python program aimed at generating static html pages ordered in the form of a graph of articles.
 
 Each article generated is appended to the graph thanks to its `Parents` and `Children` articles. This provides an easy navigation as well as an easy understanding of how the articles are linked together.  
 
@@ -18,6 +18,8 @@ You can use this program by running the following command:
 cd src
 python -m graphsitegen -f "/path/to/settings.json"
 ```
+
+See more parameters using `python -m graphsitegen --help`
 
 Before running the command, you must create a file `settings.json` that contains the following information:
 

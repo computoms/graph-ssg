@@ -1,10 +1,13 @@
-import model as modellib
-import htmlutils
-import graph
+from graphsitegen.filesystem import filechanges as fsc
+from graphsitegen.filesystem import filemanager as fsm
+from graphsitegen.filesystem import filelinker as fsl
+from graphsitegen.articlereader import ArticleReader
+from graphsitegen.article import Article
+from graphsitegen import htmlutils
+from graphsitegen import graph
 import shutil
 import sys, getopt
 import json
-import collections
 import os
 
 
@@ -57,11 +60,11 @@ def main(argv):
 	print("Start generating files from " + str(inputFolder) + " to " + str(outputFolder))
 	print("Templates are in " + str(templatesFolder))
 
-	filemgr = modellib.FileManager(inputFolder, outputFolder, templatesFolder)
-	reader = modellib.ArticleReader(filemgr)
+	filemgr = fsm.FileManager(inputFolder, outputFolder, templatesFolder)
+	reader = ArticleReader(filemgr)
 	graph_generator = graph.GraphGenerator(reader)
 	html_generator = htmlutils.HtmlGenerator(filemgr)
-	linker = modellib.FileLinker(filemgr, reader)
+	linker = fsl.FileLinker(filemgr, reader)
 
 	def update_new_links():
 		linker.create_new_files()

@@ -1,7 +1,7 @@
 import hashlib
 import os
 import json
-import article
+from graphsitegen import article
 
 # Data representing the state of a file (source / destination)
 class FileState:

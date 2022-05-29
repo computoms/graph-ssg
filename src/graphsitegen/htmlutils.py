@@ -1,7 +1,5 @@
-from article import ArticleFile
 import markdown
 from jinja2 import Environment, FileSystemLoader
-import os
 
 class HtmlGenerator:
 	def __init__(self, filemgr):

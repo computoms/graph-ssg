@@ -1,8 +1,10 @@
-import os
-import model
-import article
+from graphsitegen.articlereader import ArticleReader
+from graphsitegen.article import Article
+from graphsitegen.filesystem.filemanager import FileManager
+from graphsitegen.filesystem.filelinker import FileLinker
+from graphsitegen import article
 
-class FileManagerMock(model.FileManager):
+class FileManagerMock(FileManager):
 	def __init__(self):
 		self.source = ""
 		self.output = ""
@@ -39,7 +41,7 @@ class FileManagerMock(model.FileManager):
 	def save_output(self, name, content):
 		self.output = content
 
-class FileManagerMockForLinks(model.FileManager):
+class FileManagerMockForLinks(FileManager):
 	def __init__(self):
 		self.articles = []
 		self.source = {}
@@ -69,7 +71,7 @@ class FileManagerMockForLinks(model.FileManager):
 
 	def get_source_content(self, file):
 		article = self.get_article_internal(file.name)
-		a = model.ArticleReader(self)
+		a = ArticleReader(self)
 		content = a.get_frontmatter_json(article) + "\n" + article.content
 		return content
 
@@ -81,27 +83,27 @@ class FileManagerMockForLinks(model.FileManager):
 
 class TestArticle:
 	def test_WhenGettingPublicationDatePretty_ThenReturnsPrettyDate(self):
-		a = model.Article('', '', '', '2020-05-01', '', '')
+		a = Article('', '', '', '2020-05-01', '', '')
 		assert a.get_publication_date_pretty() == "May 01, 2020"
 
 class TestArticleReader:
 
 	def test_WithValidArtcile_WhenReadingArticle_ThenReturnsValidTitle(self):
 		f = FileManagerMock()
-		a = model.ArticleReader(f)
+		a = ArticleReader(f)
 		article = a.read_article('Source01')
 		assert article.title == "Test"
 
 	def test_WithValidArtcile_WhenReadingArticle_ThenReturnsValidParents(self):
 		f = FileManagerMock()
-		a = model.ArticleReader(f)
+		a = ArticleReader(f)
 		article = a.read_article('Source01')
 		assert len(article.parents) == 1 
 		assert article.parents[0] == "Parent01" 
 
 	def test_WithValidArtcile_WhenReadingArticle_ThenReturnsValidChildren(self):
 		f = FileManagerMock()
-		a = model.ArticleReader(f)
+		a = ArticleReader(f)
 		article = a.read_article('Source01')
 		assert len(article.children) == 2
 		assert article.children[0] == "Children01"
@@ -109,41 +111,41 @@ class TestArticleReader:
 
 	def test_WithValidArtcile_WhenReadingArticle_ThenReturnsValidContent(self):
 		f = FileManagerMock()
-		a = model.ArticleReader(f)
+		a = ArticleReader(f)
 		article = a.read_article('Source01')
 		assert article.content == " Content"
 
 	def test_WithValidArticle_WhenSavingArticle_ThenSavesCorrectlyFormattedArticle(self):
 		f = FileManagerMock()
-		a = model.ArticleReader(f)
-		article = model.Article("TestArticle", ["Parent01"], ["Children01", "Children02"], "2020-01-01", "", "This is the article content.")
+		a = ArticleReader(f)
+		article = Article("TestArticle", ["Parent01"], ["Children01", "Children02"], "2020-01-01", "", "This is the article content.")
 		a.save_article(article)
 		assert f.source == '{\n"Title": "TestArticle",\n"Abstract": "", \n"Parents": ["Parent01"], \n"Children": ["Children01","Children02"], \n"Date": "2020-01-01" \n}\nThis is the article content.'
 
 class TestFileLinker:
 	def test_WithParentWithNoChildren_WhenUpdatingChildren_ThenUpdatesParentWithOneChild(self):
 		f = FileManagerMockForLinks()
-		f.articles.append(model.Article("Parent01", [], [], "2020-01-01", "", ""))
-		f.articles.append(model.Article("Children01", ["Parent01"], [], "2020-01-01", "", ""))
-		reader = model.ArticleReader(f)
-		linker = model.FileLinker(f, reader)
+		f.articles.append(Article("Parent01", [], [], "2020-01-01", "", ""))
+		f.articles.append(Article("Children01", ["Parent01"], [], "2020-01-01", "", ""))
+		reader = ArticleReader(f)
+		linker = FileLinker(f, reader)
 		linker.update_children()
 		assert "Children01" in f.source['Parent01']
 
 	def test_WithChildrenWithoutParent_WhenUpdatingParent_ThenUpdatesChildrenWithOneParent(self):
 		f = FileManagerMockForLinks()
-		f.articles.append(model.Article("Parent01", [], ["Children01"], "", "", ""))
-		f.articles.append(model.Article("Children01", [], [], "", "", ""))
-		reader = model.ArticleReader(f)
-		linker = model.FileLinker(f, reader)
+		f.articles.append(Article("Parent01", [], ["Children01"], "", "", ""))
+		f.articles.append(Article("Children01", [], [], "", "", ""))
+		reader = ArticleReader(f)
+		linker = FileLinker(f, reader)
 		linker.update_parents()
 		assert "Parent01" in f.source['Children01']
 
 	def test_WithParentWithExistingChildren_WhenCreatingNewFile_ThenCreatesNewChildren(self):
 		f = FileManagerMockForLinks()
-		f.articles.append(model.Article("Parent01", [], ["Children01"], "", "", ""))
-		reader = model.ArticleReader(f)
-		linker = model.FileLinker(f, reader)
+		f.articles.append(Article("Parent01", [], ["Children01"], "", "", ""))
+		reader = ArticleReader(f)
+		linker = FileLinker(f, reader)
 		linker.open_editor_on_create = False
 		linker.create_new_files()
 		assert len(f.source) == 1
@@ -151,9 +153,9 @@ class TestFileLinker:
 
 	def test_WithChildWithExistingParent_WhenCreatingNewFiles_ThenCreatesNewParent(self):
 		f = FileManagerMockForLinks()
-		f.articles.append(model.Article("Children01", ["Parent01"], [], "", "", ""))
-		reader = model.ArticleReader(f)
-		linker = model.FileLinker(f, reader)
+		f.articles.append(Article("Children01", ["Parent01"], [], "", "", ""))
+		reader = ArticleReader(f)
+		linker = FileLinker(f, reader)
 		linker.open_editor_on_create = False
 		linker.create_new_files()
 		assert len(f.source) == 1

@@ -1,8 +1,8 @@
 import pytest
-import filechanges
 import os
 from unittest.mock import MagicMock
-from article import ArticleFile
+from graphsitegen.article import ArticleFile
+from graphsitegen.filesystem import filechanges
 
 # Persistence of file states into memory
 class FileStateDatabasePersistenceMemory(filechanges.FileStateDatabasePersistence):
@@ -155,6 +155,22 @@ class TestFileStateMonitor:
 		mon = filechanges.FileStateMonitor(db, "dest")
 		mon.update(ArticleFile('file', 'file.md', 'file.html'))
 		assert db.exists('file') == True
+
+	def test_WithTemplate_WhenUpdate_ThenDoesNotUpdateDatabase(self):
+		db = TestFileStateMonitor.FileStateDatabaseMock()
+		mon = filechanges.FileStateMonitor(db, 'test')
+		file = ArticleFile('template', 'template.md', 'template.html')
+		file.is_template = True
+		mon.update(file)
+		assert db.exists('template') == False
+	
+	def test_WithExistingTemplate_WhenHasChanged_ThenAlwaysTrue(self):
+		db = TestFileStateMonitor.FileStateDatabaseMock()
+		mon = filechanges.FileStateMonitor(db, 'test')
+		file = ArticleFile('template', 'template.md', 'template.html')
+		mon.update(file)
+		file.is_template = True
+		assert mon.has_changed(file) == True
 
 	def test_WithFileInDatabase_WithInexistantFile_WhenUpdate_ThenFileGetsRemovedFromDatabase(self):
 		db = TestFileStateMonitor.FileStateDatabaseMock()

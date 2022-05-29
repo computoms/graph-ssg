@@ -1,7 +1,5 @@
-import json
 from graphviz import Digraph
 
-import model
 
 
 class GraphGenerator:

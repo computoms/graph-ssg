@@ -3,3 +3,4 @@ _archive.zip
 *.DS_Store
 .build/
 .vscode/
+src/.coverage

@@ -1,6 +1,6 @@
-from graphsitegen.articlereader import ArticleReader
+from graphsitegen.article import ArticleReader
 from graphsitegen.article import Article
-from graphsitegen.filesystem.filemanager import FileManager
+from graphsitegen.filesystem import FileManager
 from graphsitegen import article
 
 class FileManagerMock(FileManager):

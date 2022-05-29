@@ -1,10 +1,9 @@
-from graphsitegen.filesystem.filemanager import FileManager
-from graphsitegen.filesystem.filemanager import Disk
+from graphsitegen import filesystem
 from unittest.mock import MagicMock
 
 from src.graphsitegen.article import ArticleFile
 
-class DiskMock(Disk):
+class DiskMock(filesystem.Disk):
     def __init__(self) -> None:
         super().__init__()
         
@@ -14,7 +13,7 @@ class DiskMock(Disk):
 class TestFileManager:
 
     def setup_method(self, method):
-        self.fm = FileManager('input', 'output', 'templates')
+        self.fm = filesystem.FileManager('input', 'output', 'templates')
         self.file = ArticleFile('test', 'input/test.md', 'output/test.html')
 
     def test_WhenCreateArticleFile_ThenReturnsValidArticleFile(self):

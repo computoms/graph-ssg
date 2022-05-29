@@ -1,10 +1,9 @@
-from graphsitegen.articlereader import ArticleReader
-from graphsitegen.filesystem.filemanager import FileManager
-from graphsitegen.filesystem.filelinker import FileLinker
+from graphsitegen import filesystem
 from graphsitegen.article import Article
 from graphsitegen.article import ArticleFile
+from graphsitegen.article import ArticleReader
 
-class FileManagerMockForLinks(FileManager):
+class FileManagerMockForLinks(filesystem.FileManager):
     def __init__(self):
         self.articles = []
         self.source = {}
@@ -48,7 +47,7 @@ class TestFileLinker:
     def setup_method(self, method):
         self.f = FileManagerMockForLinks()
         self.reader = ArticleReader(self.f)
-        self.linker = FileLinker(self.f, self.reader)
+        self.linker = filesystem.FileLinker(self.f, self.reader)
         self.linker.open_editor_on_create = False
     
     def test_WithParentWithNoChildren_WhenUpdatingChildren_ThenUpdatesParentWithOneChild(self):

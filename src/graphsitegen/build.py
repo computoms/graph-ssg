@@ -1,15 +1,11 @@
-from graphsitegen.filesystem import filechanges as fsc
-from graphsitegen.filesystem import filemanager as fsm
-from graphsitegen.filesystem import filelinker as fsl
-from graphsitegen.articlereader import ArticleReader
-from graphsitegen.article import Article
-from graphsitegen import htmlutils
-from graphsitegen import graph
 import shutil
 import sys, getopt
 import json
 import os
-
+from graphsitegen import filesystem
+from graphsitegen import article
+from graphsitegen import htmlutils
+from graphsitegen import graph
 
 # Reads settings from a file
 # File should contain the following JSON content:
@@ -60,11 +56,11 @@ def main(argv):
 	print("Start generating files from " + str(inputFolder) + " to " + str(outputFolder))
 	print("Templates are in " + str(templatesFolder))
 
-	filemgr = fsm.FileManager(inputFolder, outputFolder, templatesFolder)
-	reader = ArticleReader(filemgr)
+	filemgr = filesystem.FileManager(inputFolder, outputFolder, templatesFolder)
+	reader = article.ArticleReader(filemgr)
 	graph_generator = graph.GraphGenerator(reader)
 	html_generator = htmlutils.HtmlGenerator(filemgr)
-	linker = fsl.FileLinker(filemgr, reader)
+	linker = filesystem.FileLinker(filemgr, reader)
 
 	def update_new_links():
 		linker.create_new_files()

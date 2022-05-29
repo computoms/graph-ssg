@@ -1,15 +1,15 @@
 import unittest
 from unittest.mock import MagicMock
 from graphsitegen.htmlutils import HtmlGenerator
-from graphsitegen.filesystem.filemanager import FileManager
 from graphsitegen.article import Article
+from graphsitegen import filesystem
 import os
 
 class TestHtmlGenerator:
     def setup_method(self, method):
         current = os.path.dirname(os.path.realpath(__file__))
         templates = os.path.join(current, 'test_data/templates')
-        self.filemgr = FileManager('input', 'output', templates)
+        self.filemgr = filesystem.FileManager('input', 'output', templates)
         self.filemgr.save_output = MagicMock()
         self.gen = HtmlGenerator(self.filemgr)
 

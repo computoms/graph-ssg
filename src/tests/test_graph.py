@@ -1,9 +1,7 @@
 from unittest.mock import MagicMock
-from graphsitegen.graph import GraphGenerator
-from graphsitegen.articlereader import ArticleReader
-from graphsitegen.article import Article, ArticleFile
-from graphsitegen.filesystem import filemanager
 from graphviz import Digraph
+from graphsitegen.graph import GraphGenerator
+from graphsitegen.article import Article, ArticleFile
 
 class TestGraphGenerator:
     def setup_method(self, method):

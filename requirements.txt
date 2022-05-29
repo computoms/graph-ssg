@@ -1,5 +1,3 @@
 markdown
 graphviz
 jinja2
-shutil
-json

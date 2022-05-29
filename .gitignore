@@ -4,3 +4,5 @@ _archive.zip
 .build/
 .vscode/
 src/.coverage
+.coverage
+coverage.xml

@@ -1,7 +1,5 @@
 from graphviz import Digraph
 
-
-
 class GraphGenerator:
 
 	def __init__(self, article_reader):

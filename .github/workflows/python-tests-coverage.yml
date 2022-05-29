@@ -33,3 +33,8 @@ jobs:
       run: |
         coverage run --source=. -m pytest
         coverage-badge -o coverage.svg
+    - name: Archive badge result
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-badge
+        path: coverage.svg

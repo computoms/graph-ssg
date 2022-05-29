@@ -7,8 +7,11 @@ class GraphGenerator:
 	def __init__(self, article_reader):
 		self.article_reader = article_reader
 
-
 	def generate_full(self, articles):
+		g = self.generate_full_internal(articles)
+		return self.to_string(g)
+
+	def generate_full_internal(self, articles):
 		g = Digraph(name='Full Map', \
 			node_attr={'color': 'green', 'style': 'filled', 'shape': 'box', 'fontcolor': 'white'}, \
 			edge_attr={'arrowhead': 'none', 'arrowtail': 'dot'})
@@ -19,10 +22,17 @@ class GraphGenerator:
 			for child_title in article.children:
 				if child_title != "":
 					g.edge(file.name, child_title)
+		return g
+
+	def generate_article(self, article):
+		g = self.generate_internal(self, article)
+		return self.to_string(g)
+
+	def to_string(self, g):
 		g.format = 'svg'
 		return g.pipe().decode('utf-8')
 
-	def generate(self, article):
+	def generate_internal(self, article):
 		g = Digraph(name=article.title, \
 			node_attr={'color': 'green', 'style': 'filled', 'shape': 'box', 'fontcolor': 'white'}, \
 			edge_attr={'arrowhead': 'none', 'arrowtail': 'dot'})
@@ -39,8 +49,7 @@ class GraphGenerator:
 			child_article = self.article_reader.read_article(child)
 			self.add_children(g, child, child_article.children)
 
-		g.format='svg'
-		return g.pipe().decode('utf-8')
+		return g
 
 
 	def add_parent_level(self, g, parents, title):

@@ -77,7 +77,7 @@ def main(argv):
 				filemgr.delete_article(file)
 				continue
 			article = reader.read_article(file.name)
-			graph_svg = graph_generator.generate(article)
+			graph_svg = graph_generator.generate_article(article)
 			html_generator.generate_article(article, graph_svg)
 
 

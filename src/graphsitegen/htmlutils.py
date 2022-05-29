@@ -12,7 +12,6 @@ class HtmlGenerator:
 
 
 	def generate_article(self, article, graph_svg):
-		title = article.title
 		data = {
 		    'content': markdown.markdown(article.content),
 		    'title': article.title,

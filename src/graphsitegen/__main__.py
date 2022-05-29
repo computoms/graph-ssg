@@ -1,4 +1,4 @@
-from graphsitegen import build
+from graphsitegen.build import Builder
 import sys
 
-build.main(sys.argv[1:])
+Builder.from_args(sys.argv[1:]).run()

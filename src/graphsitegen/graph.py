@@ -23,7 +23,7 @@ class GraphGenerator:
 		return g
 
 	def generate_article(self, article):
-		g = self.generate_internal(self, article)
+		g = self.generate_internal(article)
 		return self.to_string(g)
 
 	def to_string(self, g):

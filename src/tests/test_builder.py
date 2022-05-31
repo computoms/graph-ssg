@@ -101,3 +101,8 @@ class TestBuilder:
         sys.exit = MagicMock()
         Builder.from_args(['-i', 'input', '--invalid', 'nothing'])
         sys.exit.assert_called_with(2)
+
+    def test_WhenExtractSettings_ThenReturnsCorrectGetOptsConfiguration(self):
+        short, long = Builder.extract_settings([('-h', '--help', False), ('-f', '--file', True), ('-i', '--input', True)])
+        assert short == 'hf:i:'
+        assert long == ['file=', 'input=']

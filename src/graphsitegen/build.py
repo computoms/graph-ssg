@@ -2,6 +2,7 @@ import shutil
 import sys, getopt
 import json
 import os
+
 from graphsitegen import filesystem
 from graphsitegen import article
 from graphsitegen import htmlutils
@@ -18,34 +19,33 @@ class Builder:
 		self.html_generator = htmlutils.HtmlGenerator(self.filemgr)
 		self.linker = filesystem.FileLinker(self.filemgr, self.reader)
 
+	def print_help_and_exit():
+		print("Usage:")
+		print("python generator.py -f <settingsFile>")
+		print("or")
+		print("python generator.py -i <inputFolder> -o <outputFolder> -t <templatesFolder>")
+		sys.exit(1)
+
 	# Parse python script arguments (input, output, template or settings file)
-	def from_args(argv):
-		opts = []
-		try:
-			opts, args = getopt.getopt(argv, "hi:o:t:f:", ["input=", "output=", "templates=", "file="])
-		except getopt.GetoptError:
-			print('script arguments: -i <inputFolder> -o <outputFolder> -t <templatesFolder>')
-			sys.exit(2)
+	def from_args(args):
+		help_arg = ('-h', '--help', False)
+		settings_file_arg = ('-f', '--file', True)
+		input_arg = ('-i', '--input', True)
+		output_arg = ('-o', '--output', True)
+		templates_arg = ('-t', '--templates', True)
+		known_args = [help_arg, settings_file_arg, input_arg, output_arg, templates_arg]
 
-		input_folder = './articles'
-		output_folder = './docs'
-		templates_folder = './templates'
+		options = Builder.parse_arguments(known_args, args)
 
-		for opt, arg in opts:
-			if opt == "-h":
-				print("Usage:")
-				print("python generator.py -f <settingsFile>")
-				print("or")
-				print("python generator.py -i <inputFolder> -o <outputFolder> -t <templatesFolder>")
-				sys.exit(1)
-			elif opt in ("-i", "--input"):
-				input_folder = arg
-			elif opt in ("-o", "--output"):
-				output_folder = arg
-			elif opt in ("-t", "--templates"):
-				templates_folder = arg
-			elif opt in ("-f", "--file"):
-				return Builder.from_settings(arg)
+		if options.has(help_arg):
+			Builder.print_help_and_exit()
+			
+		if options.has(settings_file_arg):
+			return Builder.from_settings(options.value(settings_file_arg).evaluate())
+
+		input_folder = options.value(input_arg).with_default('./article')
+		output_folder = options.value(output_arg).with_default('./docs')
+		templates_folder = options.value(templates_arg).with_default('./templates')
 
 		return Builder(input_folder, output_folder, templates_folder)
 
@@ -60,6 +60,21 @@ class Builder:
 		with open(settings_file, 'r') as f:
 			settings = json.loads(f.read())
 		return Builder(settings['input'], settings['output'], settings['templates'])
+
+	def parse_arguments(arguments, argv):
+		shorts, longs = Builder.extract_settings(arguments)
+		try:
+			opts, args = getopt.getopt(argv, shorts, longs)
+			return ProgramOptions(opts)
+		except getopt.GetoptError:
+			print('script arguments: -i <inputFolder> -o <outputFolder> -t <templatesFolder>')
+			sys.exit(2)
+			return ProgramOptions([])
+
+	def extract_settings(arguments):
+		short = ''.join([x[0][1] + (':' if x[2] else '') for x in arguments])
+		long = [x[1][2:] + "=" for x in filter(lambda x: x[2], arguments)]
+		return short, long
 
 	def run(self):
 		print("Start generating files from " + str(self.input_folder) + " to " + str(self.output_folder))
@@ -103,6 +118,27 @@ class Builder:
 
 		articles.sort(key=lambda x: x.publication_date, reverse=True)
 		self.html_generator.generate_news(articles)
+
+class ProgramOptions:
+	def __init__(self, options) -> None:
+		self.options = options
+
+	def value(self, argument):
+		return Optional(map(lambda y: y[1], filter(lambda x: x[0] in (argument[0], argument[1]), self.options)))
+	
+	def has(self, argument):
+		return any(filter(lambda x: x[0] in (argument[0], argument[1]), self.options))
+
+class Optional:
+	def __init__(self, iterable) -> None:
+		self.iterable = iterable
+
+	def with_default(self, default_value):
+		l = list(self.iterable)
+		return default_value if len(l) == 0 else l[0]
+
+	def evaluate(self):
+		return next(self.iterable)
 
 if __name__ == "__main__":
 	Builder.from_args(sys.argv[1:]).run()
